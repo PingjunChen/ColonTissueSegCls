@@ -1,6 +1,7 @@
 # Files
 data
 .DS_Store
+.remote-sync.json
 
 # Folders
 data/
