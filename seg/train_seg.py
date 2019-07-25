@@ -25,17 +25,17 @@ from loss import calc_loss, print_metrics
 def set_args():
     parser = argparse.ArgumentParser(description = 'Liver Tumor Patch Segmentation')
     parser.add_argument("--class_num",       type=int,   default=1)
-    parser.add_argument("--batch_size",      type=int,   default=4,       help="batch size")
+    parser.add_argument("--batch_size",      type=int,   default=2,       help="batch size")
     parser.add_argument("--in_channels",     type=int,   default=3,       help="input channel number")
     parser.add_argument("--maxepoch",        type=int,   default=100,     help="number of epochs to train")
-    parser.add_argument("--decay_epoch",     type=int,   default=8,       help="lr start to decay linearly from decay_epoch")
+    parser.add_argument("--decay_epoch",     type=int,   default=12,      help="lr start to decay linearly from decay_epoch")
     parser.add_argument("--data_dir",        type=str,   default="../data/Seg/Patches")
     parser.add_argument("--model_dir",       type=str,   default="../data/Seg/Models")
     parser.add_argument("--model_name",      type=str,   default="PSP")
     parser.add_argument("--optim_name",      type=str,   default="SGD")
-    parser.add_argument("--gpu",             type=str,   default="3",     help="training gpu")
+    parser.add_argument("--gpu",             type=str,   default="0",     help="training gpu")
     parser.add_argument("--seed",            type=int,   default=1234,    help="training seed")
-    parser.add_argument("--session",         type=str,   default="01",     help="training session")
+    parser.add_argument("--session",         type=str,   default="01",    help="training session")
 
     args = parser.parse_args()
     return args
