@@ -57,12 +57,12 @@ def gen_patches(img_dir, patch_dir, patch_size=512):
     print("There are {} pos samples and {} neg samples".format(pos_num, neg_num))
 
 if __name__ == "__main__":
-    # # validation set
-    # img_dir = "../data/ValImgs"
-    # patch_dir = "../data/Patches/val"
+    # # generate patches by neg
+    # img_dir = "../data/tissue-train-neg/train"
+    # patch_dir = "../data/Patches/train"
     # gen_patches(img_dir, patch_dir)
 
-    # training set
-    img_dir = "../data/TrainImgs"
-    patch_dir = "../data/Patches/train"
+    # generate patches by pos
+    img_dir = "../data/tissue-train-pos/val"
+    patch_dir = "../data/Patches/val"
     gen_patches(img_dir, patch_dir)
