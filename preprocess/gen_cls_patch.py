@@ -17,9 +17,11 @@ def gen_patches(img_dir, patch_dir, patch_size=512):
     img_list = pydaily.filesystem.find_ext_files(img_dir, "jpg")
     img_list = [os.path.basename(ele) for ele in img_list]
     pos_patch_dir = os.path.join(patch_dir, "1Pos")
-    pydaily.filesystem.overwrite_dir(pos_patch_dir)
+    if not os.path.exists(pos_patch_dir):
+        os.makedirs(pos_patch_dir)
     neg_patch_dir = os.path.join(patch_dir, "0Neg")
-    pydaily.filesystem.overwrite_dir(neg_patch_dir)
+    if not os.path.exists(neg_patch_dir):
+        os.makedirs(neg_patch_dir)
 
     pos_num, neg_num = 0, 0
     for ind, ele in enumerate(img_list):
@@ -46,23 +48,21 @@ def gen_patches(img_dir, patch_dir, patch_size=512):
                 io.imsave(os.path.join(pos_patch_dir, patch_name+".png"), patch_img)
                 pos_num += 1
             else:
+                if np.random.random_sample() <= 0.90 and "neg" in img_dir:
+                    continue
                 io.imsave(os.path.join(neg_patch_dir, patch_name+".png"), patch_img)
                 neg_num += 1
 
-
-
-
-                io.imsave(os.path.join(patch_mask_dir, patch_name+".png"), patch_mask)
     print("There are {} pos samples and {} neg samples".format(pos_num, neg_num))
 
 
 if __name__ == "__main__":
-    # # generate patches by neg
-    # img_dir = "../data/tissue-train-neg/train"
-    # patch_dir = "../data/Patches/train"
-    # gen_patches(img_dir, patch_dir)
+    img_dir = "../data/tissue-train-pos"
+    # img_dir = "../data/tissue-train-neg"
+    patch_dir = "../data/ClsPatches"
+    mode = "val"
+    # mode = "train"
 
-    # generate patches by pos
-    img_dir = "../data/tissue-train-pos/train"
-    patch_dir = "../data/Patches/train"
-    gen_patches(img_dir, patch_dir, patch_size=448)
+    gen_patches(os.path.join(img_dir, mode),
+                os.path.join(patch_dir, mode),
+                patch_size=448)
