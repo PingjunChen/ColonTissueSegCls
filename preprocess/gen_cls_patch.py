@@ -48,7 +48,7 @@ def gen_patches(img_dir, patch_dir, patch_size=512):
                 io.imsave(os.path.join(pos_patch_dir, patch_name+".png"), patch_img)
                 pos_num += 1
             else:
-                if np.random.random_sample() <= 0.90 and "neg" in img_dir:
+                if np.random.random_sample() <= 0.80 and "neg" in img_dir:
                     continue
                 io.imsave(os.path.join(neg_patch_dir, patch_name+".png"), patch_img)
                 neg_num += 1
