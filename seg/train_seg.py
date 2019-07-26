@@ -25,7 +25,7 @@ from loss import calc_loss, print_metrics
 def set_args():
     parser = argparse.ArgumentParser(description = 'Liver Tumor Patch Segmentation')
     parser.add_argument("--class_num",       type=int,   default=1)
-    parser.add_argument("--batch_size",      type=int,   default=2,       help="batch size")
+    parser.add_argument("--batch_size",      type=int,   default=4,       help="batch size")
     parser.add_argument("--in_channels",     type=int,   default=3,       help="input channel number")
     parser.add_argument("--maxepoch",        type=int,   default=100,     help="number of epochs to train")
     parser.add_argument("--decay_epoch",     type=int,   default=12,      help="lr start to decay linearly from decay_epoch")
