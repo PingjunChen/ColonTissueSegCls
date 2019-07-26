@@ -13,10 +13,10 @@ from patchloader import val_loader
 def set_args():
     parser = argparse.ArgumentParser(description='Thyroid Classification')
     parser.add_argument('--seed',            type=int,   default=1234)
-    parser.add_argument('--batch_size',      type=int,   default=64)
+    parser.add_argument('--batch_size',      type=int,   default=256)
     parser.add_argument('--model_dir',       type=str,   default="../data/PatchCLS/Models")
     parser.add_argument('--model_name',      type=str,   default="resnet50")
-    parser.add_argument('--model_path',      type=str,   default="")
+    parser.add_argument('--model_path',      type=str,   default="01-0.8277.pth")
 
     args = parser.parse_args()
     return args
