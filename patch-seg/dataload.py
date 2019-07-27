@@ -3,9 +3,11 @@
 import os, sys
 import numpy as np
 from skimage import io
+import torch
 from torchvision import transforms
 from torch.utils.data import Dataset
 from torch.utils.data import DataLoader
+
 
 class LiverPatchDataset(Dataset):
     def __init__(self, data_dir, transform=None):
@@ -26,12 +28,12 @@ class LiverPatchDataset(Dataset):
 
         image = (io.imread(patch_path) / 255.0).astype(np.float32)
         mask = (io.imread(mask_path) / 255.0).astype(np.float32)
-        mask = np.expand_dims(mask, axis=0)
+        mask = torch.from_numpy(np.expand_dims(mask, axis=0))
 
         if self.transform:
             image = self.transform(image)
-
         return [image, mask]
+
 
 
 def gen_dloader(data_dir, batch_size, mode="train"):
@@ -68,5 +70,6 @@ class PatchDataset(Dataset):
         mask = np.expand_dims(self.masks[idx,...], axis=0)
         if self.transform:
             patch = self.transform(patch)
+        import pdb; pdb.set_trace();
 
         return patch, mask
