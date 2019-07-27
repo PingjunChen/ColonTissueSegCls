@@ -10,6 +10,8 @@ import torch.nn as nn
 from torch.autograd import Variable
 from sklearn import metrics
 import numpy as np
+from timeit import default_timer as timer
+from pydaily import tic
 from patchloader import train_loader, val_loader
 
 
@@ -40,7 +42,7 @@ def train_patch_model(args):
     # optimizer & loss
     optimizer = optim.SGD(model.parameters(), weight_decay=args.weight_decay,
                           lr=args.lr, momentum=0.9, nesterov=True)
-    criterion =nn.CrossEntropyLoss()
+    criterion =nn.CrossEntropyLoss(weight=torch.FloatTensor([1.0, 2.0]).cuda())
 
     # dataloader
     train_data_loader = train_loader(args.batch_size)
@@ -54,6 +56,7 @@ def train_patch_model(args):
 
     best_acc = 0.0
     for epoch in range(0, args.epochs):
+        start = timer()
         print("Current learning rate is: {:.6f}".format(optimizer.param_groups[0]['lr']))
         adjust_learning_rate(optimizer, epoch, args)
         # train for one epoch
@@ -63,10 +66,12 @@ def train_patch_model(args):
         # save current best model on validation
         if val_acc > best_acc:
             best_acc = val_acc
-            cur_model_name = str(epoch).zfill(2) + "-{:.4f}.pth".format(best_acc)
+            cur_model_name = str(epoch+1).zfill(2) + "-{:.3f}.pth".format(best_acc)
             torch.save(model.cpu(), os.path.join(save_model_dir, cur_model_name))
             print('Save weights at {}/{}'.format(save_model_dir, cur_model_name))
             model.cuda()
+        end = timer()
+        print("Epoch {:03d} takes {}".format(epoch+1, tic.time_to_str(end - start, "sec")))
 
 
 def train_model(train_loader, model, criterion, optimizer, epoch, args):
@@ -93,9 +98,9 @@ def train_model(train_loader, model, criterion, optimizer, epoch, args):
 
         if batch_idx > 0 and batch_idx % args.log_interval == 0:
             batch_progress = 100. * batch_idx / len(train_loader)
-            print("Train Epoch: {} [{}/{} ({:.2f})%)]".format(
+            print("Train Epoch: {} [{}/{} ({:.3f})%)]".format(
                 epoch, batch_idx, len(train_loader), batch_progress))
-    print("Training accuracy on Epoch {} is [{}/{} {:.4f})]\t Loss: {:.4f}".format(
+    print("Training accuracy on Epoch {} is [{}/{} {:.3f})]\t Loss: {:.5f}".format(
         epoch, correct, total, correct/total, ttl_loss/total))
     train_cm = metrics.confusion_matrix(gt_labels, pred_labels)
     print("Training confusion matrix:")
