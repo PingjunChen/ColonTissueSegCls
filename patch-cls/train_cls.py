@@ -13,7 +13,7 @@ def set_args():
     parser.add_argument('--epochs',          type=int,   default=10)
     parser.add_argument('--batch_size',      type=int,   default=64)
     # Optimization parameters
-    parser.add_argument('--lr',              type=float, default=1.0e-2)
+    parser.add_argument('--lr',              type=float, default=1.0e-3)
     parser.add_argument('--lr_decay_epochs', type=int,   default=2)
     parser.add_argument('--lr_decay_ratio',  type=float, default=0.3)
     parser.add_argument('--weight_decay',    type=float, default=5.0e-4)
@@ -23,15 +23,16 @@ def set_args():
     parser.add_argument('--model_dir',       type=str,   default="../data/PatchCLS/Models")
     parser.add_argument('--class_num',       type=int,   default=2)
     parser.add_argument('--model_name',      type=str,   default="resnet50")
-    parser.add_argument('--session',         type=str,   default="01")
+    parser.add_argument('--session',         type=str,   default="02")
+    parser.add_argument("--gpu",             type=str,   default="2",     help="training gpu")
 
     args = parser.parse_args()
     return args
 
 
 if __name__ == '__main__':
-    os.environ["CUDA_VISIBLE_DEVICES"] = "0"
-    args = set_args()
+    args = set_args()    
+    os.environ["CUDA_VISIBLE_DEVICES"] = args.gpu
     torch.cuda.manual_seed(args.seed)
     cudnn.benchmark = True
 
