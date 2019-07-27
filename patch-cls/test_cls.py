@@ -16,15 +16,16 @@ def set_args():
     parser.add_argument('--batch_size',      type=int,   default=256)
     parser.add_argument('--model_dir',       type=str,   default="../data/PatchCLS/Models")
     parser.add_argument('--model_name',      type=str,   default="resnet50")
-    parser.add_argument('--model_path',      type=str,   default="01-0.8277.pth")
+    parser.add_argument('--model_path',      type=str,   default="04-0.831.pth")
+    parser.add_argument("--gpu",             type=str,   default="1")
 
     args = parser.parse_args()
     return args
 
 
 if __name__ == '__main__':
-    os.environ["CUDA_VISIBLE_DEVICES"] = "0"
     args = set_args()
+    os.environ["CUDA_VISIBLE_DEVICES"] = args.gpu
     torch.cuda.manual_seed(args.seed)
     cudnn.benchmark = True
 
