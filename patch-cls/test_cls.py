@@ -16,8 +16,8 @@ def set_args():
     parser.add_argument('--batch_size',      type=int,   default=256)
     parser.add_argument('--model_dir',       type=str,   default="../data/PatchCLS/Models")
     parser.add_argument('--model_name',      type=str,   default="resnet50")
-    parser.add_argument('--model_path',      type=str,   default="04-0.831.pth")
-    parser.add_argument("--gpu",             type=str,   default="1")
+    parser.add_argument('--model_path',      type=str,   default="09-0.836.pth")
+    parser.add_argument("--gpu",             type=str,   default="2")
 
     args = parser.parse_args()
     return args
