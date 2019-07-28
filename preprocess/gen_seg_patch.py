@@ -5,7 +5,7 @@ from skimage import io
 import numpy as np
 import shutil, uuid
 import PIL
-PIL.Image.MAX_IMAGE_PIXELS = 933120000
+PIL.Image.MAX_IMAGE_PIXELS = None
 import warnings
 warnings.filterwarnings("ignore", category=FutureWarning)
 
