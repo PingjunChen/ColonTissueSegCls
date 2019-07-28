@@ -23,8 +23,7 @@ def gen_wsi_feas(img_dir, fea_dir, patch_len=448, stride_len=224):
         cur_img = io.imread(img_path)
         # split coors and save patches
         coors_arr = wsi_stride_splitting(cur_img.shape[0], cur_img.shape[1], patch_len, stride_len)
-        patch_num = 0
-        patch_list = []
+        patch_list, coor_list = [], []
         for coor in coors_arr:
             start_h, start_w = coor[0], coor[1]
             patch_img = cur_img[start_h:start_h+patch_len, start_w:start_w+patch_len]
@@ -32,17 +31,12 @@ def gen_wsi_feas(img_dir, fea_dir, patch_len=448, stride_len=224):
             if patch.patch_bk_ratio(patch_img, bk_thresh=0.864) > 0.88:
                 continue
             patch_list.append(patch_img)
-            patch_num += 1
-        if patch_num < min_num:
-            min_num = patch_num
-        if patch_num > max_num:
-            max_num = patch_num
-
+            coor_list.append([start_h, start_w, start_h+patch_len, start_w+patch_len])
+        # For patch feature generation
         patch_arr = np.asarray(patch_list)
         patch_dset = PatchDataset(patch_arr)
         patch_loader = DataLoader(patch_dset, batch_size=8, shuffle=False, num_workers=4, drop_last=False)
 
-    print("Max and min patch numbers are {} and {}".format(max_num, min_num))
 
 
 if __name__ == "__main__":
