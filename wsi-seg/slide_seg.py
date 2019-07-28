@@ -14,18 +14,23 @@ import torch.backends.cudnn as cudnn
 import torch.nn.functional as F
 from pydaily import filesystem
 
+import PIL
+PIL.Image.MAX_IMAGE_PIXELS = None
+import warnings
+warnings.filterwarnings("ignore", category=FutureWarning)
+
 from segnet import pspnet
 from utils import wsi_stride_splitting,  gen_patch_mask_wmap
 from patch_loader import PatchDataset
 
 
 def set_args():
-    parser = argparse.ArgumentParser(description = 'Liver Tumor Slide Segmentation')
+    parser = argparse.ArgumentParser(description = 'Colon Tumor Slide Segmentation')
     parser.add_argument("--class_num",       type=int,   default=1)
     parser.add_argument("--in_channels",     type=int,   default=3)
     parser.add_argument("--batch_size",      type=int,   default=8)
     parser.add_argument("--stride_len",      type=int,   default=64)
-    parser.add_argument("--patch_len",       type=int,   default=448)
+    parser.add_argument("--patch_len",       type=int,   default=256)
     parser.add_argument("--gpu",             type=str,   default="2")
     parser.add_argument("--best_model",      type=str,   default="PSP-018-0.779.pth")
     parser.add_argument("--model_dir",       type=str,   default="../data/PatchSeg/Models")
