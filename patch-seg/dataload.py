@@ -49,27 +49,3 @@ def gen_dloader(data_dir, batch_size, mode="train"):
         raise Exception("Unknow mode: {}".format(mode))
 
     return dloader
-
-
-class PatchDataset(Dataset):
-    """
-    Dataset for slide testing. Each would be splitted into multiple patches.
-    Prediction is made on these splitted patches.
-    """
-
-    def __init__(self, patch_arr, mask_arr):
-        self.patches = patch_arr
-        self.masks = mask_arr
-        self.transform = transforms.Compose([transforms.ToTensor(), ])
-
-    def __len__(self):
-        return self.patches.shape[0]
-
-    def __getitem__(self, idx):
-        patch = self.patches[idx,...]
-        mask = np.expand_dims(self.masks[idx,...], axis=0)
-        if self.transform:
-            patch = self.transform(patch)
-        import pdb; pdb.set_trace();
-
-        return patch, mask
