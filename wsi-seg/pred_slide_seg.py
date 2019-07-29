@@ -17,7 +17,7 @@ from pydaily import filesystem
 import PIL
 PIL.Image.MAX_IMAGE_PIXELS = None
 import warnings
-warnings.filterwarnings("ignore", category=FutureWarning)
+warnings.simplefilter("ignore", UserWarning)
 
 from segnet import pspnet
 from utils import wsi_stride_splitting,  gen_patch_wmap
@@ -31,7 +31,7 @@ def set_args():
     parser.add_argument("--batch_size",      type=int,   default=8)
     parser.add_argument("--stride_len",      type=int,   default=64)
     parser.add_argument("--patch_len",       type=int,   default=256)
-    parser.add_argument("--gpu",             type=str,   default="1")
+    parser.add_argument("--gpu",             type=str,   default="2")
     parser.add_argument("--best_model",      type=str,   default="PSP-018-0.779.pth")
     parser.add_argument("--model_dir",       type=str,   default="../data/PatchSeg/Models")
     parser.add_argument("--slides_dir",      type=str,   default="../data/SlideSeg/TestSlides")
@@ -64,25 +64,32 @@ def test_slide_seg(args):
         slide_img = io.imread(slide_path)
         # split and predict
         coors_arr = wsi_stride_splitting(slide_img.shape[0], slide_img.shape[1], patch_len=args.patch_len, stride_len=args.stride_len)
-        patch_arr, wmap = gen_patch_wmap(slide_img, coors_arr, plen=args.patch_len)
-        patch_dset = PatchDataset(patch_arr)
-        patch_loader = DataLoader(patch_dset, batch_size=args.batch_size, shuffle=False, num_workers=4, drop_last=False)
-        ttl_samples = 0
+        wmap = np.zeros((slide_img.shape[0], slide_img.shape[1]), dtype=np.int32)
         pred_map = np.zeros_like(wmap).astype(np.float32)
-        for ind, patches in enumerate(patch_loader):
-            inputs = Variable(patches.cuda())
-            with torch.no_grad():
-                outputs = model(inputs)
-                preds = F.sigmoid(outputs)
-                preds = torch.squeeze(preds, dim=1).data.cpu().numpy()
-                if (ind+1)*args.batch_size <= len(coors_arr):
-                    patch_coors = coors_arr[ind*args.batch_size:(ind+1)*args.batch_size]
-                else:
-                    patch_coors = coors_arr[ind*args.batch_size:]
-                for ind, coor in enumerate(patch_coors):
-                    ph, pw = coor[0], coor[1]
-                    pred_map[ph:ph+args.patch_len, pw:pw+args.patch_len] += preds[ind]
-                ttl_samples += inputs.size(0)
+
+        patch_list, coor_list = [], []
+        for ic, coor in enumerate(coors_arr):
+            ph, pw = coor[0], coor[1]
+            patch_list.append(slide_img[ph:ph+args.patch_len, pw:pw+args.patch_len] / 255.0)
+            coor_list.append([ph, pw])
+            wmap[ph:ph+args.patch_len, pw:pw+args.patch_len] += 1
+            if len(patch_list) == args.batch_size or ic+1 == len(coors_arr):
+                patch_arr = np.asarray(patch_list).astype(np.float32)
+                patch_dset = PatchDataset(patch_arr)
+                patch_loader = DataLoader(patch_dset, batch_size=args.batch_size, shuffle=False, num_workers=4, drop_last=False)
+                with torch.no_grad():
+                    pred_list = []
+                    for patches in patch_loader:
+                        inputs = Variable(patches.cuda())
+                        outputs = model(inputs)
+                        preds = F.sigmoid(outputs)
+                        preds = torch.squeeze(preds, dim=1).data.cpu().numpy()
+                        pred_list.append(preds)
+                    batch_preds = np.concatenate(pred_list, axis=0)
+                    for ind, coor in enumerate(coor_list):
+                        ph, pw = coor[0], coor[1]
+                        pred_map[ph:ph+args.patch_len, pw:pw+args.patch_len] += batch_preds[ind]
+                patch_list, coor_list = [], []
 
         prob_pred = np.divide(pred_map, wmap)
         slide_pred = (prob_pred > 0.5).astype(np.uint8) * 255
