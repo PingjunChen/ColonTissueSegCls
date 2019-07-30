@@ -25,7 +25,7 @@ from loss import calc_loss, print_metrics
 def set_args():
     parser = argparse.ArgumentParser(description = 'Liver Tumor Patch Segmentation')
     parser.add_argument("--class_num",       type=int,   default=1)
-    parser.add_argument("--batch_size",      type=int,   default=4,      help="batch size")
+    parser.add_argument("--batch_size",      type=int,   default=16,      help="batch size")
     parser.add_argument("--in_channels",     type=int,   default=3,      help="input channel number")
     parser.add_argument("--maxepoch",        type=int,   default=30,     help="number of epochs to train")
     parser.add_argument("--decay_epoch",     type=int,   default=5,      help="lr start to decay linearly from decay_epoch")
@@ -33,7 +33,7 @@ def set_args():
     parser.add_argument("--model_dir",       type=str,   default="../data/PatchSeg/Models")
     parser.add_argument("--model_name",      type=str,   default="PSP")
     parser.add_argument("--optim_name",      type=str,   default="SGD")
-    parser.add_argument("--gpu",             type=str,   default="3",     help="training gpu")
+    parser.add_argument("--gpu",             type=str,   default="0, 1, 2, 3",     help="training gpu")
     parser.add_argument("--seed",            type=int,   default=1234,    help="training seed")
     parser.add_argument("--session",         type=str,   default="01",    help="training session")
 
@@ -53,6 +53,7 @@ def train_seg_model(args):
     else:
         raise AssertionError("Unknow modle: {}".format(args.model_name))
     model.cuda()
+    model = nn.DataParallel(model)
     # optimizer
     optimizer = None
     if args.optim_name == "Adam":

@@ -32,7 +32,7 @@ def set_args():
     parser.add_argument("--batch_size",      type=int,   default=16)
     parser.add_argument("--gpu",             type=str,   default="2")
     parser.add_argument("--model_name",      type=str,   default="PSP")
-    parser.add_argument("--best_model",      type=str,   default="PSP-018-0.779.pth")
+    parser.add_argument("--best_model",      type=str,   default="PSP-001-0.422.pth")
     parser.add_argument("--model_dir",       type=str,   default="../data/PatchSeg/Models")
     parser.add_argument("--data_dir",        type=str,   default="../data/PatchSeg/Patches")
     parser.add_argument("--seed",            type=int,   default=1234)
@@ -52,6 +52,7 @@ def test_seg_model(args):
     else:
         raise AssertionError("Unknow modle: {}".format(args.model_name))
     model_path = os.path.join(args.model_dir, args.model_name, args.best_model)
+    model = nn.DataParallel(model)
     model.load_state_dict(torch.load(model_path))
     model.cuda()
     model.eval()
@@ -65,7 +66,7 @@ def test_seg_model(args):
     preds_dir = os.path.join(args.data_dir, "val/preds", args.model_name)
     filesystem.overwrite_dir(preds_dir)
     for batch_ind, (imgs, masks) in enumerate(dloader):
-        if batch_ind != 0 and batch_ind % 10 == 0:
+        if batch_ind != 0 and batch_ind % 100 == 0:
             print("Processing {}/{}".format(batch_ind, len(dloader)))
         inputs = Variable(imgs.cuda())
         masks = Variable(masks.cuda())
