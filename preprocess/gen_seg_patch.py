@@ -45,11 +45,11 @@ def gen_patches(img_dir, patch_dir, patch_size=448):
             patch_mask = cur_mask[start_h:start_h+patch_size, start_w:start_w+patch_size]
             pixel_ratio = np.sum(patch_mask > 0) * 1.0 / patch_mask.size
             save_flag = True
-            if pixel_ratio >= 0.10:
+            if pixel_ratio >= 0.05:
                 pos_num += 1
             else:
                 if "neg" in img_dir:
-                    if np.random.random_sample() > 0.88:
+                    if np.random.random_sample() > 0.92:
                         neg_num += 1
                     else:
                         save_flag = False
@@ -63,6 +63,6 @@ def gen_patches(img_dir, patch_dir, patch_size=448):
 
 
 if __name__ == "__main__":
-    img_dir = "../data/tissue-train-pos/train"
-    patch_dir = "../data/SegPatches/train"
+    img_dir = "../data/tissue-train-pos/val"
+    patch_dir = "../data/SegPatches/val"
     gen_patches(img_dir, patch_dir, patch_size=448)
