@@ -25,16 +25,16 @@ from utils import gen_patch_pred
 
 
 def set_args():
-    parser = argparse.ArgumentParser(description = 'Viable Tumor Segmentation')
+    parser = argparse.ArgumentParser(description="Colon Patch Segmentation")
 
     parser.add_argument("--class_num",       type=int,   default=1)
     parser.add_argument("--in_channels",     type=int,   default=3)
     parser.add_argument("--batch_size",      type=int,   default=16)
-    parser.add_argument("--gpu",             type=str,   default="2")
+    parser.add_argument("--gpu",             type=str,   default="1, 2")
     parser.add_argument("--model_name",      type=str,   default="PSP")
-    parser.add_argument("--best_model",      type=str,   default="PSP-001-0.422.pth")
+    parser.add_argument("--best_model",      type=str,   default="PSP-012-0.655.pth")
     parser.add_argument("--model_dir",       type=str,   default="../data/PatchSeg/Models")
-    parser.add_argument("--data_dir",        type=str,   default="../data/PatchSeg/Patches")
+    parser.add_argument("--data_dir",        type=str,   default="../data/PatchSeg/SegPatchesNew")
     parser.add_argument("--seed",            type=int,   default=1234)
 
     args = parser.parse_args()
@@ -42,16 +42,10 @@ def set_args():
 
 
 def test_seg_model(args):
-    model = None
-    if args.model_name == "UNet":
-        model = UNet(n_channels=args.in_channels, n_classes=args.class_num)
-    elif args.model_name == "PSP":
-        model = pspnet.PSPNet(n_classes=19, input_size=(448, 448))
-        model.load_pretrained_model(model_path="./segnet/pspnet/pspnet101_cityscapes.caffemodel")
-        model.classification = nn.Conv2d(512, args.class_num, kernel_size=1)
-    else:
-        raise AssertionError("Unknow modle: {}".format(args.model_name))
-    model_path = os.path.join(args.model_dir, args.model_name, args.best_model)
+    model = pspnet.PSPNet(n_classes=19, input_size=(448, 448))
+    model.load_pretrained_model(model_path="./segnet/pspnet/pspnet101_cityscapes.caffemodel")
+    model.classification = nn.Conv2d(512, args.class_num, kernel_size=1)
+    model_path = os.path.join(args.model_dir, args.best_model)
     model = nn.DataParallel(model)
     model.load_state_dict(torch.load(model_path))
     model.cuda()
@@ -63,8 +57,9 @@ def test_seg_model(args):
 
     metrics = defaultdict(float)
     ttl_samples = 0
-    preds_dir = os.path.join(args.data_dir, "val/preds", args.model_name)
-    filesystem.overwrite_dir(preds_dir)
+    
+    # preds_dir = os.path.join(args.data_dir, "val/preds", args.model_name)
+    # filesystem.overwrite_dir(preds_dir)
     for batch_ind, (imgs, masks) in enumerate(dloader):
         if batch_ind != 0 and batch_ind % 100 == 0:
             print("Processing {}/{}".format(batch_ind, len(dloader)))
@@ -91,5 +86,5 @@ if  __name__ == '__main__':
     cudnn.benchmark = True
 
     # train model
-    print("Test using: {}, model: {}".format(args.model_name, args.best_model))
+    print("Test using: {}".format(args.model_name))
     test_seg_model(args)
