@@ -23,46 +23,32 @@ from loss import calc_loss, print_metrics
 
 
 def set_args():
-    parser = argparse.ArgumentParser(description = 'Liver Tumor Patch Segmentation')
+    parser = argparse.ArgumentParser(description="Colon Patch Segmentation")
     parser.add_argument("--class_num",       type=int,   default=1)
-    parser.add_argument("--batch_size",      type=int,   default=16,      help="batch size")
+    parser.add_argument("--batch_size",      type=int,   default=16,     help="batch size")
     parser.add_argument("--in_channels",     type=int,   default=3,      help="input channel number")
     parser.add_argument("--maxepoch",        type=int,   default=30,     help="number of epochs to train")
     parser.add_argument("--decay_epoch",     type=int,   default=5,      help="lr start to decay linearly from decay_epoch")
-    parser.add_argument("--data_dir",        type=str,   default="../data/PatchSeg/Patches")
+    parser.add_argument("--data_dir",        type=str,   default="../data/PatchSeg/SegPatchesNew")
     parser.add_argument("--model_dir",       type=str,   default="../data/PatchSeg/Models")
     parser.add_argument("--model_name",      type=str,   default="PSP")
-    parser.add_argument("--optim_name",      type=str,   default="SGD")
     parser.add_argument("--gpu",             type=str,   default="0, 1, 2, 3",     help="training gpu")
     parser.add_argument("--seed",            type=int,   default=1234,    help="training seed")
-    parser.add_argument("--session",         type=str,   default="01",    help="training session")
+    parser.add_argument("--session",         type=str,   default="02",    help="training session")
 
     args = parser.parse_args()
     return args
 
 
 def train_seg_model(args):
-    # model
-    model = None
-    if args.model_name == "UNet":
-        model = UNet(n_channels=args.in_channels, n_classes=args.class_num)
-    elif args.model_name == "PSP":
-        model = pspnet.PSPNet(n_classes=19, input_size=(448, 448))
-        model.load_pretrained_model(model_path="./segnet/pspnet/pspnet101_cityscapes.caffemodel")
-        model.classification = nn.Conv2d(512, args.class_num, kernel_size=1)
-    else:
-        raise AssertionError("Unknow modle: {}".format(args.model_name))
+    model = pspnet.PSPNet(n_classes=19, input_size=(448, 448))
+    model.load_pretrained_model(model_path="./segnet/pspnet/pspnet101_cityscapes.caffemodel")
+    model.classification = nn.Conv2d(512, args.class_num, kernel_size=1)
     model.cuda()
     model = nn.DataParallel(model)
     # optimizer
-    optimizer = None
-    if args.optim_name == "Adam":
-        optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=1.0e-3)
-    elif args.optim_name == "SGD":
-        optimizer = optim.SGD(filter(lambda p: p.requires_grad, model.parameters()),
-                              lr=1.0e-2, momentum=0.9, weight_decay=0.0005)
-    else:
-        raise AssertionError("Unknow optimizer: {}".format(args.optim_name))
+    optimizer = optim.SGD(filter(lambda p: p.requires_grad, model.parameters()), lr=1.0e-2,
+                          momentum=0.9, weight_decay=0.0005)
     scheduler = lr_scheduler.StepLR(optimizer, step_size=args.decay_epoch, gamma=0.6)
     # dataloader
     train_data_dir = os.path.join(args.data_dir, "train")
@@ -71,7 +57,7 @@ def train_seg_model(args):
     val_dloader = gen_dloader(test_data_dir, args.batch_size, mode="val")
 
     # training
-    save_model_dir = os.path.join(args.model_dir, args.model_name, args.session)
+    save_model_dir = os.path.join(args.model_dir, args.session)
     if not os.path.exists(save_model_dir):
         os.makedirs(save_model_dir)
     best_dice = 0.0
@@ -129,5 +115,5 @@ if  __name__ == '__main__':
     cudnn.benchmark = True
 
     # train model
-    print("Training {} with {}".format(args.model_name, args.optim_name))
+    print("Start training...")
     train_seg_model(args)
