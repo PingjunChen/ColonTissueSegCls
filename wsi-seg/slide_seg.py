@@ -25,17 +25,17 @@ from patch_loader import PatchDataset
 
 
 def set_args():
-    parser = argparse.ArgumentParser(description = 'Colon Tumor Slide Segmentation')
+    parser = argparse.ArgumentParser(description="Colon Tumor Slide Segmentation")
     parser.add_argument("--class_num",       type=int,   default=1)
     parser.add_argument("--in_channels",     type=int,   default=3)
-    parser.add_argument("--batch_size",      type=int,   default=8)
+    parser.add_argument("--batch_size",      type=int,   default=16)
     parser.add_argument("--stride_len",      type=int,   default=32)
     parser.add_argument("--patch_len",       type=int,   default=448)
-    parser.add_argument("--gpu",             type=str,   default="3")
-    parser.add_argument("--best_model",      type=str,   default="PSP-018-0.779.pth")
-    parser.add_argument("--model_dir",       type=str,   default="../data/PatchSeg/Models")
-    parser.add_argument("--slides_dir",      type=str,   default="../data/SlideSeg/TestSlides")
-    parser.add_argument("--result_dir",      type=str,   default="../data/SlideSeg/TestResults")
+    parser.add_argument("--gpu",             type=str,   default="1, 2, 3")
+    parser.add_argument("--best_model",      type=str,   default="PSP-023-0.667.pth")
+    parser.add_argument("--model_dir",       type=str,   default="../data/PatchSeg/BestModels")
+    parser.add_argument("--slides_dir",      type=str,   default="../data/SlideSeg/TestNegSlides")
+    parser.add_argument("--result_dir",      type=str,   default="../data/SlideSeg/TestNegResults")
     parser.add_argument("--seed",            type=int,   default=1234)
 
     args = parser.parse_args()
@@ -48,6 +48,7 @@ def test_slide_seg(args):
     model.classification = nn.Conv2d(512, args.class_num, kernel_size=1)
 
     model_path = os.path.join(args.model_dir, args.best_model)
+    model = nn.DataParallel(model)
     model.load_state_dict(torch.load(model_path))
     model.cuda()
     model.eval()
