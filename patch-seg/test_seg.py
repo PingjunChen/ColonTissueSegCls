@@ -29,11 +29,11 @@ def set_args():
 
     parser.add_argument("--class_num",       type=int,   default=1)
     parser.add_argument("--in_channels",     type=int,   default=3)
-    parser.add_argument("--batch_size",      type=int,   default=16)
-    parser.add_argument("--gpu",             type=str,   default="1, 2")
+    parser.add_argument("--batch_size",      type=int,   default=8)
+    parser.add_argument("--gpu",             type=str,   default="0")
     parser.add_argument("--model_name",      type=str,   default="PSP")
-    parser.add_argument("--best_model",      type=str,   default="PSP-012-0.655.pth")
-    parser.add_argument("--model_dir",       type=str,   default="../data/PatchSeg/Models")
+    parser.add_argument("--best_model",      type=str,   default="PSP-023-0.667.pth")
+    parser.add_argument("--model_dir",       type=str,   default="../data/PatchSeg/BestModels")
     parser.add_argument("--data_dir",        type=str,   default="../data/PatchSeg/SegPatchesNew")
     parser.add_argument("--seed",            type=int,   default=1234)
 
@@ -57,7 +57,7 @@ def test_seg_model(args):
 
     metrics = defaultdict(float)
     ttl_samples = 0
-    
+
     # preds_dir = os.path.join(args.data_dir, "val/preds", args.model_name)
     # filesystem.overwrite_dir(preds_dir)
     for batch_ind, (imgs, masks) in enumerate(dloader):
