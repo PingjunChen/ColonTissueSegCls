@@ -29,7 +29,7 @@ def set_args():
     parser.add_argument("--class_num",       type=int,   default=1)
     parser.add_argument("--in_channels",     type=int,   default=3)
     parser.add_argument("--batch_size",      type=int,   default=16)
-    parser.add_argument("--stride_len",      type=int,   default=128)
+    parser.add_argument("--stride_len",      type=int,   default=64)
     parser.add_argument("--patch_len",       type=int,   default=448)
     parser.add_argument("--gpu",             type=str,   default="2, 3")
     parser.add_argument("--best_model",      type=str,   default="PSP-023-0.667.pth")
