@@ -2,6 +2,9 @@
 data
 .DS_Store
 .remote-sync.json
+*.png
+*.jpg
+*.tif
 
 # Folders
 data/
