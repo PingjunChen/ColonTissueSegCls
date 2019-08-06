@@ -25,16 +25,16 @@ from loss import calc_loss, print_metrics
 def set_args():
     parser = argparse.ArgumentParser(description="Colon Patch Segmentation")
     parser.add_argument("--class_num",       type=int,   default=1)
-    parser.add_argument("--batch_size",      type=int,   default=16,     help="batch size")
+    parser.add_argument("--batch_size",      type=int,   default=8,      help="batch size")
     parser.add_argument("--in_channels",     type=int,   default=3,      help="input channel number")
-    parser.add_argument("--maxepoch",        type=int,   default=30,     help="number of epochs to train")
-    parser.add_argument("--decay_epoch",     type=int,   default=5,      help="lr start to decay linearly from decay_epoch")
+    parser.add_argument("--maxepoch",        type=int,   default=20,     help="number of epochs to train")
+    parser.add_argument("--decay_epoch",     type=int,   default=3,      help="lr start to decay linearly from decay_epoch")
     parser.add_argument("--data_dir",        type=str,   default="../data/PatchSeg/SegPatchesNew")
     parser.add_argument("--model_dir",       type=str,   default="../data/PatchSeg/Models")
     parser.add_argument("--model_name",      type=str,   default="PSP")
-    parser.add_argument("--gpu",             type=str,   default="0, 1, 2, 3",     help="training gpu")
-    parser.add_argument("--seed",            type=int,   default=1234,    help="training seed")
-    parser.add_argument("--session",         type=str,   default="02",    help="training session")
+    parser.add_argument("--gpu",             type=str,   default="2, 3", help="training gpu")
+    parser.add_argument("--seed",            type=int,   default=1234,   help="training seed")
+    parser.add_argument("--session",         type=str,   default="03",   help="training session")
 
     args = parser.parse_args()
     return args
@@ -87,10 +87,11 @@ def train_seg_model(args):
 
                 with torch.set_grad_enabled(phase=='train'):
                     outputs = model(inputs)
-                    loss = calc_loss(outputs, masks, metrics, bce_weight=0.2)
+                    loss = calc_loss(outputs, masks, metrics, bce_weight=0.1)
                     if phase == 'train':
                         loss.backward()
                         optimizer.step()
+
                 # statistics
                 epoch_samples += inputs.size(0)
             print_metrics(metrics, epoch_samples, phase)
