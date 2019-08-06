@@ -4,7 +4,7 @@ import os, sys
 import numpy as np
 import matplotlib.pyplot as plt
 import argparse, uuid, time
-from skimage import io, transform
+from skimage import io, transform, morphology
 from collections import defaultdict
 import torch
 import torch.nn as nn
@@ -29,9 +29,9 @@ def set_args():
     parser.add_argument("--class_num",       type=int,   default=1)
     parser.add_argument("--in_channels",     type=int,   default=3)
     parser.add_argument("--batch_size",      type=int,   default=8)
-    parser.add_argument("--stride_len",      type=int,   default=64)
+    parser.add_argument("--stride_len",      type=int,   default=256)
     parser.add_argument("--patch_len",       type=int,   default=448)
-    parser.add_argument("--gpu",             type=str,   default="0, 1")
+    parser.add_argument("--gpu",             type=str,   default="3")
     parser.add_argument("--best_model",      type=str,   default="PSP-023-0.667.pth")
     parser.add_argument("--model_dir",       type=str,   default="../data/PatchSeg/BestModels")
     parser.add_argument("--slides_dir",      type=str,   default="../data/SlideSeg/TestPosSlides")
@@ -93,12 +93,13 @@ def test_slide_seg(args):
                 patch_list, coor_list = [], []
 
         prob_pred = np.divide(pred_map, wmap)
-        slide_pred = (prob_pred > 0.5).astype(np.uint8) * 255
+        slide_pred = morphology.remove_small_objects(prob_pred>0.5, min_size=20480).astype(np.uint8)
         pred_save_path = os.path.join(args.result_dir, os.path.splitext(cur_slide)[0]+".png")
-        io.imsave(pred_save_path, slide_pred)
+        io.imsave(pred_save_path, slide_pred*255)
 
     time_elapsed = time.time() - since
-    print('Testing takes {:.0f}m {:.2f}s'.format(time_elapsed // 60, time_elapsed % 60))
+    print("stride-len: {} with batch-size: {}".format(args.stride_len, args.batch_size))
+    print("Testing takes {:.0f}m {:.2f}s".format(time_elapsed // 60, time_elapsed % 60))
 
 
 if  __name__ == '__main__':

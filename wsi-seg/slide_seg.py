@@ -29,13 +29,13 @@ def set_args():
     parser.add_argument("--class_num",       type=int,   default=1)
     parser.add_argument("--in_channels",     type=int,   default=3)
     parser.add_argument("--batch_size",      type=int,   default=16)
-    parser.add_argument("--stride_len",      type=int,   default=64)
+    parser.add_argument("--stride_len",      type=int,   default=128)
     parser.add_argument("--patch_len",       type=int,   default=448)
-    parser.add_argument("--gpu",             type=str,   default="2, 3")
+    parser.add_argument("--gpu",             type=str,   default="2")
     parser.add_argument("--best_model",      type=str,   default="PSP-023-0.667.pth")
     parser.add_argument("--model_dir",       type=str,   default="../data/PatchSeg/BestModels")
-    parser.add_argument("--slides_dir",      type=str,   default="../data/SlideSeg/TestNegSlides")
-    parser.add_argument("--result_dir",      type=str,   default="../data/SlideSeg/TestNegResults")
+    parser.add_argument("--slides_dir",      type=str,   default="../data/SlideSeg/TestPosSlides")
+    parser.add_argument("--result_dir",      type=str,   default="../data/SlideSeg/TestPosResults")
     parser.add_argument("--seed",            type=int,   default=1234)
 
     args = parser.parse_args()
@@ -54,7 +54,7 @@ def test_slide_seg(args):
     model.eval()
 
     since = time.time()
-    filesystem.overwrite_dir(args.result_dir)
+    # filesystem.overwrite_dir(args.result_dir)
     slide_names = [ele for ele in os.listdir(args.slides_dir) if "jpg" in ele]
 
     ttl_pred_dice = 0.0
@@ -95,9 +95,9 @@ def test_slide_seg(args):
                 patch_list, coor_list = [], []
 
         prob_pred = np.divide(pred_map, wmap)
-        slide_pred = morphology.remove_small_objects(prob_pred > 0.5, min_size=40960).astype(np.uint8)
-        pred_save_path = os.path.join(args.result_dir, os.path.splitext(cur_slide)[0]+".png")
-        io.imsave(pred_save_path, slide_pred*255)
+        slide_pred = morphology.remove_small_objects(prob_pred > 0.5, min_size=20480).astype(np.uint8)
+        # pred_save_path = os.path.join(args.result_dir, os.path.splitext(cur_slide)[0]+".png")
+        # io.imsave(pred_save_path, slide_pred*255)
         intersection = np.multiply(mask_img, slide_pred)
         pred_dice = np.sum(intersection) / (np.sum(mask_img)+np.sum(slide_pred)-np.sum(intersection) + 1.0e-8)
         ttl_pred_dice += pred_dice
