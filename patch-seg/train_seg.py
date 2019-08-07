@@ -87,7 +87,7 @@ def train_seg_model(args):
 
                 with torch.set_grad_enabled(phase=='train'):
                     outputs = model(inputs)
-                    loss = calc_loss(outputs, masks, metrics, bce_weight=0.1)
+                    loss = calc_loss(outputs, masks, metrics, bce_weight=0.3)
                     if phase == 'train':
                         loss.backward()
                         optimizer.step()
