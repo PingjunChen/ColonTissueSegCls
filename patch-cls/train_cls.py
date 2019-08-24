@@ -3,10 +3,8 @@
 import os, sys
 import argparse
 import torch
-import torch.backends.cudnn as cudnn
 
 from train_eng import train_patch_model
-
 
 def set_args():
     parser = argparse.ArgumentParser(description='Patch Classification')
@@ -31,10 +29,9 @@ def set_args():
 
 
 if __name__ == '__main__':
-    args = set_args()    
+    args = set_args()
     os.environ["CUDA_VISIBLE_DEVICES"] = args.gpu
     torch.cuda.manual_seed(args.seed)
-    cudnn.benchmark = True
 
     print("Fine-tuning {} model".format(args.model_name))
     train_patch_model(args)

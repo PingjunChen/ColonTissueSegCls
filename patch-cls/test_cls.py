@@ -4,7 +4,7 @@
 import os, sys
 import argparse
 import torch
-import torch.backends.cudnn as cudnn
+
 
 from train_eng import validate_model
 from patchloader import val_loader
@@ -27,7 +27,6 @@ if __name__ == '__main__':
     args = set_args()
     os.environ["CUDA_VISIBLE_DEVICES"] = args.gpu
     torch.cuda.manual_seed(args.seed)
-    cudnn.benchmark = True
 
     model_full_path = os.path.join(args.model_dir, args.model_name, args.model_path)
     ft_model = torch.load(model_full_path)
