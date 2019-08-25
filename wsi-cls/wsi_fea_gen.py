@@ -92,11 +92,12 @@ def gen_wsi_feas(patch_model, img_dir, fea_dir, args):
 
 def set_args():
     parser = argparse.ArgumentParser(description="WSI patch-based feature extraction")
-    parser.add_argument('--img_dir',       type=str,  default="../data/SlideCLS/SlideImgs/tissue-train-neg/train")
-    parser.add_argument('--fea_dir',       type=str,  default="../data/SlideCLS/SlideFeas/train/0Neg")
-    parser.add_argument('--model_dir',     type=str,  default='../data/PatchCLS/Models/resnet50')
-    parser.add_argument('--patch_cls_name',type=str,  default="09-0.836.pth")
-    parser.add_argument('--device_id',     type=str,  default="0",  help='which device')
+    parser.add_argument('--img_dir',       type=str,  default="../data/SlideCLS/Split1235/SlideImgs/tissue-train-pos/train")
+    parser.add_argument('--fea_dir',       type=str,  default="../data/SlideCLS/Split1235/SlideFeas/resnet50/train/1Pos")
+    parser.add_argument('--model_dir',     type=str,  default="../data/PatchCLS/Split1235/Models")
+    parser.add_argument('--model_name',    type=str,  default="resnet50")
+    parser.add_argument('--patch_cls_name',type=str,  default="04-0.897.pth")
+    parser.add_argument('--device_id',     type=str,  default="1",  help='which device')
     parser.add_argument('--class_num',     type=int,  default=2)
     parser.add_argument('--patch_len',     type=int,  default=448)
     parser.add_argument('--stride_len',    type=int,  default=256)
@@ -115,7 +116,7 @@ if __name__ == "__main__":
     cudnn.benchmark = True
 
     # load patch cls model
-    cls_weightspath = os.path.join(args.model_dir, args.patch_cls_name)
+    cls_weightspath = os.path.join(args.model_dir, args.model_name, args.patch_cls_name)
     patch_model = torch.load(cls_weightspath)
     patch_model.cuda()
     patch_model.eval()

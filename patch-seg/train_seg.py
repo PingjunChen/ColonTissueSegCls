@@ -22,19 +22,29 @@ from dataload import gen_dloader
 from loss import calc_loss, print_metrics
 
 
+class LambdaLR():
+    def __init__(self, n_epochs, offset, decay_start_epoch):
+        assert ((n_epochs - decay_start_epoch) > 0), "Decay must start before the training session ends!"
+        self.n_epochs = n_epochs
+        self.offset = offset
+        self.decay_start_epoch = decay_start_epoch
+
+    def step(self, epoch):
+        return 1.0 - max(0, epoch + self.offset - self.decay_start_epoch)/(self.n_epochs - self.decay_start_epoch)
+
+
 def set_args():
     parser = argparse.ArgumentParser(description="Colon Patch Segmentation")
     parser.add_argument("--class_num",       type=int,   default=1)
     parser.add_argument("--batch_size",      type=int,   default=8,      help="batch size")
     parser.add_argument("--in_channels",     type=int,   default=3,      help="input channel number")
-    parser.add_argument("--maxepoch",        type=int,   default=30,     help="number of epochs to train")
-    parser.add_argument("--decay_epoch",     type=int,   default=8,      help="lr start to decay linearly from decay_epoch")
+    parser.add_argument("--maxepoch",        type=int,   default=50,     help="number of epochs to train")
     parser.add_argument("--data_dir",        type=str,   default="../data/PatchSeg/Patches")
     parser.add_argument("--model_dir",       type=str,   default="../data/PatchSeg/Models")
     parser.add_argument("--model_name",      type=str,   default="PSP")
     parser.add_argument("--gpu",             type=str,   default="2, 3", help="training gpu")
     parser.add_argument("--seed",            type=int,   default=1234,   help="training seed")
-    parser.add_argument("--session",         type=str,   default="03",   help="training session")
+    parser.add_argument("--session",         type=str,   default="01",   help="training session")
 
     args = parser.parse_args()
     return args
@@ -47,9 +57,9 @@ def train_seg_model(args):
     model.cuda()
     model = nn.DataParallel(model)
     # optimizer
-    optimizer = optim.SGD(filter(lambda p: p.requires_grad, model.parameters()), lr=1.0e-2,
+    optimizer = optim.SGD(filter(lambda p: p.requires_grad, model.parameters()), lr=1.0e-3,
                           momentum=0.9, weight_decay=0.0005)
-    scheduler = lr_scheduler.StepLR(optimizer, step_size=args.decay_epoch, gamma=0.6)
+    scheduler = lr_scheduler.LambdaLR(optimizer, lr_lambda=LambdaLR(args.maxepoch, 0, 0).step)
     # dataloader
     train_data_dir = os.path.join(args.data_dir, "train")
     train_dloader = gen_dloader(train_data_dir, args.batch_size, mode="train")
