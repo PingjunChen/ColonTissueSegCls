@@ -8,7 +8,7 @@ import torch.utils.data
 from torchvision import datasets, transforms
 
 
-DataRoot = "../data/PatchCLS/Patches"
+DataRoot = "../data/PatchCLS/Split1235/Patches"
 TrainDir = os.path.join(DataRoot, 'train')
 ValDir = os.path.join(DataRoot, 'val')
 
@@ -45,6 +45,7 @@ def get_mean_and_std(img_dir, suffix, model_input_size=224):
 
 
 rgb_mean, rgb_std = (0.700, 0.520, 0.720), (0.170, 0.200, 0.128)
+
 
 def train_loader(batch_size, model_input_size=224):
     kwargs = {"num_workers": 4, "pin_memory": True}

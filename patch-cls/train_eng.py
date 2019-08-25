@@ -25,10 +25,7 @@ def adjust_learning_rate(optimizer, epoch, args):
 
 def train_patch_model(args):
     # construct model
-    if args.model_name == "resnet34":
-        model = models.resnet34(pretrained=True)
-        model.fc = nn.Linear(512*1, args.class_num)
-    elif args.model_name == "resnet50":
+    if args.model_name == "resnet50":
         model = models.resnet50(pretrained=True)
         model.fc = nn.Linear(512*4, args.class_num)
     elif args.model_name == "vgg16bn":

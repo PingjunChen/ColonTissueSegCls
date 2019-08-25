@@ -14,10 +14,10 @@ def set_args():
     parser = argparse.ArgumentParser(description='Thyroid Classification')
     parser.add_argument('--seed',            type=int,   default=1234)
     parser.add_argument('--batch_size',      type=int,   default=256)
-    parser.add_argument('--model_dir',       type=str,   default="../data/PatchCLS/Models")
+    parser.add_argument('--model_dir',       type=str,   default="../data/PatchCLS/Split1235/Models")
     parser.add_argument('--model_name',      type=str,   default="resnet50")
-    parser.add_argument('--model_path',      type=str,   default="09-0.836.pth")
-    parser.add_argument("--gpu",             type=str,   default="2")
+    parser.add_argument('--model_path',      type=str,   default="04-0.897.pth")
+    parser.add_argument("--gpu",             type=str,   default="1")
 
     args = parser.parse_args()
     return args

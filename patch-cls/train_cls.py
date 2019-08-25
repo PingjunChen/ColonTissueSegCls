@@ -6,10 +6,11 @@ import torch
 
 from train_eng import train_patch_model
 
+
 def set_args():
     parser = argparse.ArgumentParser(description='Patch Classification')
     parser.add_argument('--epochs',          type=int,   default=10)
-    parser.add_argument('--batch_size',      type=int,   default=64)
+    parser.add_argument('--batch_size',      type=int,   default=32)
     # Optimization parameters
     parser.add_argument('--lr',              type=float, default=1.0e-3)
     parser.add_argument('--lr_decay_epochs', type=int,   default=2)
@@ -18,11 +19,11 @@ def set_args():
     parser.add_argument('--seed',            type=int,   default=1234)
     parser.add_argument('--log_interval',    type=int,   default=100)
     # model directory and name
-    parser.add_argument('--model_dir',       type=str,   default="../data/PatchCLS/Models")
+    parser.add_argument('--model_dir',       type=str,   default="../data/PatchCLS/Split1234/Models")
     parser.add_argument('--class_num',       type=int,   default=2)
-    parser.add_argument('--model_name',      type=str,   default="resnet50")
-    parser.add_argument('--session',         type=str,   default="02")
-    parser.add_argument("--gpu",             type=str,   default="2",     help="training gpu")
+    parser.add_argument('--model_name',      type=str,   default="vgg16bn")
+    parser.add_argument('--session',         type=str,   default="01")
+    parser.add_argument("--gpu",             type=str,   default="1",     help="training gpu")
 
     args = parser.parse_args()
     return args
