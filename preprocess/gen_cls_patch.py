@@ -57,12 +57,10 @@ def gen_patches(img_dir, patch_dir, patch_size=512):
 
 
 if __name__ == "__main__":
-    img_dir = "../data/tissue-train-pos"
-    # img_dir = "../data/tissue-train-neg"
+    # img_dir = "../data/tissue-train-pos"
+    img_dir = "../data/tissue-train-neg"
     patch_dir = "../data/ClsPatches"
-    mode = "val"
-    # mode = "train"
+    # mode = "val"
+    mode = "train"
 
-    gen_patches(os.path.join(img_dir, mode),
-                os.path.join(patch_dir, mode),
-                patch_size=448)
+    gen_patches(os.path.join(img_dir, mode), os.path.join(patch_dir, mode), patch_size=448)
