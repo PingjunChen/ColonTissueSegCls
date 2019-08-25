@@ -11,6 +11,7 @@ $ docker images
 
 ## Start container
 ```
+$ docker run -it --name ColonSeg --restart always colon
 $ docker run -it --name ColonSeg --restart always -v ~/CPath/colon-tissue-seg:/App colon
 ```
 

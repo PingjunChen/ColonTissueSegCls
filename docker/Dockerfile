@@ -6,8 +6,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # Create a working directory
 RUN mkdir /App
-WORKDIR /App
-
+COPY ~/CPath/colon-tissue-seg /App/colon-analysis
+WORKDIR /App/colon-analysis
 
 # Create a non-root user and switch to it
 RUN adduser --disabled-password --gecos '' --shell /bin/bash chenpingjun \
