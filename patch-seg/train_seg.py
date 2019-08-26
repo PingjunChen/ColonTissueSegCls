@@ -57,8 +57,7 @@ def train_seg_model(args):
     model.cuda()
     model = nn.DataParallel(model)
     # optimizer
-    optimizer = optim.SGD(filter(lambda p: p.requires_grad, model.parameters()), lr=1.0e-3,
-                          momentum=0.9, weight_decay=0.0005)
+    optimizer = optim.SGD(filter(lambda p: p.requires_grad, model.parameters()), lr=1.0e-3, momentum=0.9, weight_decay=0.0005)
     scheduler = lr_scheduler.LambdaLR(optimizer, lr_lambda=LambdaLR(args.maxepoch, 0, 0).step)
     # dataloader
     train_data_dir = os.path.join(args.data_dir, "train")
