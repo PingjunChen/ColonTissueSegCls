@@ -44,7 +44,7 @@ def set_args():
     parser.add_argument("--model_name",      type=str,   default="PSP")
     parser.add_argument("--gpu",             type=str,   default="2, 3", help="training gpu")
     parser.add_argument("--seed",            type=int,   default=1234,   help="training seed")
-    parser.add_argument("--session",         type=str,   default="01",   help="training session")
+    parser.add_argument("--session",         type=str,   default="02",   help="training session")
 
     args = parser.parse_args()
     return args
@@ -89,7 +89,7 @@ def train_seg_model(args):
             metrics = defaultdict(float)
             epoch_samples = 0
             for batch_ind, (imgs, masks) in enumerate(dloader):
-                if batch_ind % 100 == 0 and batch_ind > 0:
+                if batch_ind % 500 == 0 and batch_ind > 0:
                     print("{:4d}/{:4d}".format(batch_ind, len(dloader)))
                 inputs = Variable(imgs.cuda())
                 masks = Variable(masks.cuda())
@@ -97,7 +97,7 @@ def train_seg_model(args):
 
                 with torch.set_grad_enabled(phase=='train'):
                     outputs = model(inputs)
-                    loss = calc_loss(outputs, masks, metrics, bce_weight=0.3)
+                    loss = calc_loss(outputs, masks, metrics, bce_weight=0.1)
                     if phase == 'train':
                         loss.backward()
                         optimizer.step()

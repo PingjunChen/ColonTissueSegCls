@@ -14,14 +14,14 @@ from train_wsinet import train_cls
 def set_args():
     # Arguments setting
     parser = argparse.ArgumentParser(description="Colon image classification")
-    parser.add_argument('--data_dir',        type=str,          default="../data/SlideCLS/SlideFeas")
+    parser.add_argument('--data_dir',        type=str,          default="../data/SlideCLS/Split1234")
+    parser.add_argument('--patch_model',     type=str,          default="resnet50")
     parser.add_argument('--batch_size',      type=int,          default=32,      help='batch size.')
-    parser.add_argument('--device_id',       type=str,          default="1",     help='which device')
+    parser.add_argument('--device_id',       type=str,          default="6",     help='which device')
     parser.add_argument('--pre_load',        type=bool,         default=False,   help='load setting')
     parser.add_argument('--lr',              type=float,        default=1.0e-3,  help='learning rate (default: 0.01)')
     parser.add_argument('--maxepoch',        type=int,          default=100,     help='number of epochs to train (default: 10)')
     parser.add_argument('--fusion_mode',     type=str,          default="selfatt")
-    parser.add_argument('--session',         type=str,          default="01")
 
     args = parser.parse_args()
     return args
@@ -37,16 +37,16 @@ if  __name__ == '__main__':
     net.cuda()
 
     # prepare dataset
-    train_data_dir = os.path.join(args.data_dir, "train")
+    train_data_dir = os.path.join(args.data_dir, "SlideFeas", args.patch_model, "train")
     train_dataset = wsiDataSet(train_data_dir, pre_load=args.pre_load, testing=False)
-    test_data_dir = os.path.join(args.data_dir, "test")
-    test_dataset = wsiDataSet(test_data_dir, pre_load=args.pre_load, testing=True)
+    val_data_dir = os.path.join(args.data_dir, "SlideFeas", args.patch_model, "val")
+    val_dataset = wsiDataSet(val_data_dir, pre_load=args.pre_load, testing=True)
     train_dataloader = DataLoader(dataset=train_dataset, batch_size=args.batch_size,
                                   shuffle=True, num_workers=4, pin_memory=True)
-    test_dataloader = DataLoader(dataset=test_dataset, batch_size=args.batch_size,
+    val_dataloader = DataLoader(dataset=val_dataset, batch_size=args.batch_size,
                                  shuffle=False, num_workers=4, pin_memory=True)
 
     print(">> START training")
-    model_root = os.path.join("../data/SlideCLS/WsiModel", args.session, args.fusion_mode)
+    model_root = os.path.join(args.data_dir, "WsiModels", args.patch_model, args.fusion_mode)
     pydaily.filesystem.overwrite_dir(model_root)
-    train_cls(net, train_dataloader, test_dataloader, model_root, args)
+    train_cls(net, train_dataloader, val_dataloader, model_root, args)
