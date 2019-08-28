@@ -13,7 +13,7 @@ from wsinet import WsiNet
 
 def load_wsinet(args):
     wsinet = WsiNet(class_num=2, in_channels=2048, mode=args.fusion_mode)
-    weightspath = os.path.join(args.model_dir, args.fusion_mode, args.wsi_cls_name)
+    weightspath = os.path.join(args.model_dir, args.cnn_model, args.fusion_mode, args.wsi_cls_name)
     wsi_weights_dict = torch.load(weightspath, map_location=lambda storage, loc: storage)
     wsinet.load_state_dict(wsi_weights_dict)
     wsinet.cuda()
@@ -29,6 +29,7 @@ def test_cls(net, dataloader):
         # print("Pred {:03d}/{:03d}".format(ind+1, len(dataloader)))
         im_data = Variable(batch_feas.cuda())
         # true_num = Variable(true_num.cuda())
+        import pdb; pdb.set_trace()
         cls_probs, assignments = net(im_data, None, true_num=true_num)
         _, cls_labels = torch.topk(cls_probs.cpu(), 1, dim=1)
         cls_labels = cls_labels.numpy()[:, 0]
