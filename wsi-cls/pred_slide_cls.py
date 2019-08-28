@@ -1,0 +1,131 @@
+# -*- coding: utf-8 -*-
+
+import os, sys
+from skimage import io
+import numpy as np
+import argparse
+import deepdish as dd
+import PIL
+PIL.Image.MAX_IMAGE_PIXELS = None
+from pyslide import patch
+import pydaily
+from timeit import default_timer as timer
+
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+from torch.utils.data import DataLoader
+from torch.autograd import Variable
+from patch_loader import PatchDataset, wsi_stride_splitting
+from wsinet import WsiNet
+
+
+def extract_model_feas(patch_model, input_tensor):
+    x = patch_model.conv1(input_tensor)
+    x = patch_model.bn1(x)
+    x = patch_model.relu(x)
+    x = patch_model.maxpool(x)
+
+    x = patch_model.layer1(x)
+    x = patch_model.layer2(x)
+    x = patch_model.layer3(x)
+    x = patch_model.layer4(x)
+
+    x = patch_model.avgpool(x)
+    feas = torch.flatten(x, 1)
+    logits = patch_model.fc(feas)
+    probs = F.softmax(logits, dim=1)
+
+    return feas, probs
+
+
+def gen_wsi_feas(patch_model, img_path, args):
+    img_name = os.path.splitext(img_path)[0]
+    feas_list, probs_list, coor_list = [], [], []
+
+    cur_img = io.imread(img_path)
+    # split coors and save patches
+    coors_arr = wsi_stride_splitting(cur_img.shape[0], cur_img.shape[1], args.patch_len, args.stride_len)
+    patch_list = []
+    for ind, coor in enumerate(coors_arr):
+        start_h, start_w = coor[0], coor[1]
+        patch_img = cur_img[start_h:start_h+args.patch_len, start_w:start_w+args.patch_len]
+        # image background control
+        if patch.patch_bk_ratio(patch_img, bk_thresh=0.864) <= 0.88:
+            patch_list.append(patch_img)
+
+        # Processing the feature extraction in batch-wise manner to avoid huge memory consumption
+        if len(patch_list) == 64 or ind+1 == len(coors_arr):
+            patch_arr = np.asarray(patch_list)
+            patch_dset = PatchDataset(patch_arr)
+            patch_loader = DataLoader(patch_dset, batch_size=64, shuffle=False, num_workers=4, drop_last=False)
+            with torch.no_grad():
+                for inputs in patch_loader:
+                    batch_tensor = Variable(inputs.cuda())
+                    feas, probs = extract_model_feas(patch_model, batch_tensor)
+                    batch_feas = feas.cpu().data.numpy().tolist()
+                    batch_probs = probs.cpu().data.numpy().tolist()
+                    feas_list.extend(batch_feas)
+                    probs_list.extend(batch_probs)
+            patch_list = []
+
+    all_feas = np.asarray(feas_list).astype(np.float32)
+    all_probs = np.asarray(probs_list).astype(np.float32)
+    sorted_ind = np.argsort(all_probs[:, 0])
+
+    TEST_PATCH_NUM = 12
+    feas_placeholder = np.zeros((TEST_PATCH_NUM, all_feas.shape[1]), dtype=np.float32)
+    test_patch_num = min(len(all_feas), TEST_PATCH_NUM)
+    chosen_total_ind = sorted_ind[:test_patch_num]
+    feas_placeholder[:test_patch_num] = all_feas[chosen_total_ind]
+    return feas_placeholder, test_patch_num
+
+
+
+def set_args():
+    parser = argparse.ArgumentParser(description="Colon slides classification")
+    parser.add_argument('--seed',          type=int,  default=1234)
+    parser.add_argument('--device_id',     type=str,  default="1",  help='which device')
+    parser.add_argument('--img_dir',       type=str,  default="../data/SlideCLS/Split1235/SlideImgs/tissue-train-neg/val")
+    parser.add_argument('--patch_model',   type=str,  default="../data/PatchCLS/Split1235/Models/resnet50/04-0.897.pth")
+    parser.add_argument('--wsi_model',     type=str,  default="../data/SlideCLS/Split1235/WsiModels/resnet50/selfatt/epoch_030_acc_0.985_tn_080_fp_002_fn_000_tp_050.pth")
+    parser.add_argument('--fusion_mode',   type=str,  default="selfatt")
+    parser.add_argument('--class_num',     type=int,  default=2)
+    parser.add_argument('--stride_len',    type=int,  default=256)
+    parser.add_argument('--patch_len',     type=int,  default=448)
+    args = parser.parse_args()
+    return args
+
+
+if __name__ == "__main__":
+    args = set_args()
+    os.environ["CUDA_VISIBLE_DEVICES"] = str(args.device_id)
+
+    # load patch cls model
+    patch_model = torch.load(args.patch_model)
+    patch_model.cuda()
+    patch_model.eval()
+
+    # load wsi cls model
+    wsinet = WsiNet(class_num=2, in_channels=2048, mode=args.fusion_mode)
+    wsi_weights_dict = torch.load(args.wsi_model, map_location=lambda storage, loc: storage)
+    wsinet.load_state_dict(wsi_weights_dict)
+    wsinet.cuda()
+    wsinet.eval()
+
+    # test slide
+    test_slide_list = [ele for ele in os.listdir(args.img_dir) if "jpg" in ele]
+    total_num = len(test_slide_list)
+
+    correct_num = 0
+    for test_slide in test_slide_list:
+        test_slide_path = os.path.join(args.img_dir, test_slide)
+        chosen_feas, chosen_num = gen_wsi_feas(patch_model, test_slide_path, args)
+        slide_fea_data = torch.from_numpy(chosen_feas).unsqueeze(0)
+        im_data = Variable(slide_fea_data.cuda())
+        true_num = torch.from_numpy(np.array([chosen_num]))
+        cls_probs, _ = wsinet(im_data, None, true_num=true_num)
+        test_prob = cls_probs.cpu().data.numpy()[0][1]
+        if test_prob >  0.5:
+            correct_num += 1
+    print("Testing accuracy is {}/{}".format(correct_num, total_num))
