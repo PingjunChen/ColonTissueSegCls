@@ -18,6 +18,8 @@ import PIL
 PIL.Image.MAX_IMAGE_PIXELS = None
 import warnings
 warnings.simplefilter("ignore", UserWarning)
+import pydaily
+from timeit import default_timer as timer
 
 from segnet import pspnet
 from utils import wsi_stride_splitting,  gen_patch_wmap
@@ -32,7 +34,7 @@ def set_args():
     parser.add_argument("--stride_len",      type=int,   default=256)
     parser.add_argument("--patch_len",       type=int,   default=448)
     parser.add_argument("--gpu",             type=str,   default="3")
-    parser.add_argument("--best_model",      type=str,   default="PSP-023-0.667.pth")
+    parser.add_argument("--best_model",      type=str,   default="PSP-001-0.581.pth")
     parser.add_argument("--model_dir",       type=str,   default="../data/PatchSeg/BestModels")
     parser.add_argument("--slides_dir",      type=str,   default="../data/SlideSeg/TestPosSlides")
     parser.add_argument("--result_dir",      type=str,   default="../data/SlideSeg/TestPosResultsPred")
@@ -44,7 +46,7 @@ def set_args():
 
 def test_slide_seg(args):
     model = pspnet.PSPNet(n_classes=19, input_size=(args.patch_len, args.patch_len))
-    model.load_pretrained_model(model_path="./segnet/pspnet/pspnet101_cityscapes.caffemodel")
+    # model.load_pretrained_model(model_path="./segnet/pspnet/pspnet101_cityscapes.caffemodel")
     model.classification = nn.Conv2d(512, args.class_num, kernel_size=1)
 
     model_path = os.path.join(args.model_dir, args.best_model)
@@ -60,6 +62,7 @@ def test_slide_seg(args):
     ttl_pred_dice = 0.0
     for num, cur_slide in enumerate(slide_names):
         print("--{:2d}/{:2d} Slide:{}".format(num+1, len(slide_names), cur_slide))
+        start_time = timer()
         # load slide image and mask
         slide_path = os.path.join(args.slides_dir, cur_slide)
         slide_img = io.imread(slide_path)
@@ -96,6 +99,8 @@ def test_slide_seg(args):
         slide_pred = morphology.remove_small_objects(prob_pred>0.5, min_size=20480).astype(np.uint8)
         pred_save_path = os.path.join(args.result_dir, os.path.splitext(cur_slide)[0]+".png")
         io.imsave(pred_save_path, slide_pred*255)
+        end_time = timer()
+        print("Takes {}".format(pydaily.tic.time_to_str(end_time-start_time, 'sec')))
 
     time_elapsed = time.time() - since
     print("stride-len: {} with batch-size: {}".format(args.stride_len, args.batch_size))

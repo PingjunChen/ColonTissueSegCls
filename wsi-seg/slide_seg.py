@@ -29,7 +29,7 @@ def set_args():
     parser.add_argument("--class_num",       type=int,   default=1)
     parser.add_argument("--in_channels",     type=int,   default=3)
     parser.add_argument("--batch_size",      type=int,   default=32)
-    parser.add_argument("--stride_len",      type=int,   default=128)
+    parser.add_argument("--stride_len",      type=int,   default=256)
     parser.add_argument("--patch_len",       type=int,   default=448)
     parser.add_argument("--gpu",             type=str,   default="2, 3")
     # parser.add_argument("--best_model",      type=str,   default="PSP-023-0.667.pth")
@@ -45,7 +45,7 @@ def set_args():
 
 def test_slide_seg(args):
     model = pspnet.PSPNet(n_classes=19, input_size=(args.patch_len, args.patch_len))
-    model.load_pretrained_model(model_path="./segnet/pspnet/pspnet101_cityscapes.caffemodel")
+    # model.load_pretrained_model(model_path="./segnet/pspnet/pspnet101_cityscapes.caffemodel")
     model.classification = nn.Conv2d(512, args.class_num, kernel_size=1)
 
     model_path = os.path.join(args.model_dir, args.best_model)
