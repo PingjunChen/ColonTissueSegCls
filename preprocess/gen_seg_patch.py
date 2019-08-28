@@ -48,7 +48,7 @@ def gen_patches(img_dir, patch_dir, patch_size=448):
             if pixel_ratio >= 0.05:
                 pos_num += 1
             else:
-                if "neg" in img_dir:
+                if "Neg" in img_dir:
                     if np.random.random_sample() > 0.92:
                         neg_num += 1
                     else:
@@ -63,6 +63,6 @@ def gen_patches(img_dir, patch_dir, patch_size=448):
 
 
 if __name__ == "__main__":
-    img_dir = "../data/tissue-train-pos/val"
-    patch_dir = "../data/SegPatches/val"
+    img_dir = "/media/pingjun/CPATHOLOGY/Segmentation/ColonData/Split1234/Pos/train"
+    patch_dir = "/media/pingjun/CPATHOLOGY/Segmentation/ColonData/Split1234/SegPatches/train"
     gen_patches(img_dir, patch_dir, patch_size=448)
