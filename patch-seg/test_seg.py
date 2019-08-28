@@ -34,7 +34,7 @@ def set_args():
     parser.add_argument("--model_name",      type=str,   default="PSP")
     parser.add_argument("--best_model",      type=str,   default="PSP-023-0.667.pth")
     parser.add_argument("--model_dir",       type=str,   default="../data/PatchSeg/BestModels")
-    parser.add_argument("--data_dir",        type=str,   default="../data/PatchSeg/SegPatchesNew")
+    parser.add_argument("--data_dir",        type=str,   default="../data/PatchSeg/SegPatches")
     parser.add_argument("--seed",            type=int,   default=1234)
 
     args = parser.parse_args()
