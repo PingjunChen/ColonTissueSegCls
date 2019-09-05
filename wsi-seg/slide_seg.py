@@ -28,12 +28,12 @@ def set_args():
     parser = argparse.ArgumentParser(description="Colon Tumor Slide Segmentation")
     parser.add_argument("--class_num",       type=int,   default=1)
     parser.add_argument("--in_channels",     type=int,   default=3)
-    parser.add_argument("--batch_size",      type=int,   default=32)
+    parser.add_argument("--batch_size",      type=int,   default=24)
     parser.add_argument("--stride_len",      type=int,   default=256)
     parser.add_argument("--patch_len",       type=int,   default=448)
-    parser.add_argument("--gpu",             type=str,   default="2, 3")
+    parser.add_argument("--gpu",             type=str,   default="3, 4")
     # parser.add_argument("--best_model",      type=str,   default="PSP-023-0.667.pth")
-    parser.add_argument("--best_model",      type=str,   default="PSP-007-0.612.pth")
+    parser.add_argument("--best_model",      type=str,   default="PSP-050-0.665.pth")
     parser.add_argument("--model_dir",       type=str,   default="../data/PatchSeg/BestModels")
     parser.add_argument("--slides_dir",      type=str,   default="../data/SlideSeg/TestPosSlides")
     parser.add_argument("--result_dir",      type=str,   default="../data/SlideSeg/TestPosResults")
@@ -45,7 +45,6 @@ def set_args():
 
 def test_slide_seg(args):
     model = pspnet.PSPNet(n_classes=19, input_size=(args.patch_len, args.patch_len))
-    # model.load_pretrained_model(model_path="./segnet/pspnet/pspnet101_cityscapes.caffemodel")
     model.classification = nn.Conv2d(512, args.class_num, kernel_size=1)
 
     model_path = os.path.join(args.model_dir, args.best_model)
