@@ -85,7 +85,7 @@ def gen_wsi_feas(patch_model, img_path, args):
 def set_args():
     parser = argparse.ArgumentParser(description="Colon slides classification")
     parser.add_argument('--seed',          type=int,  default=1234)
-    parser.add_argument('--device_id',     type=str,  default="1",  help='which device')
+    parser.add_argument('--device_id',     type=str,  default="4",  help='which device')
     parser.add_argument('--img_dir',       type=str,  default="../data/SlideCLS/Split1235/SlideImgs/tissue-train-neg/val")
     parser.add_argument('--patch_model',   type=str,  default="../data/PatchCLS/Split1235/Models/resnet50/04-0.897.pth")
     parser.add_argument('--wsi_model',     type=str,  default="../data/SlideCLS/Split1235/WsiModels/resnet50/selfatt/epoch_030_acc_0.985_tn_080_fp_002_fn_000_tp_050.pth")

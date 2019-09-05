@@ -35,6 +35,7 @@ def extract_model_feas(patch_model, input_tensor):
 
     return feas, probs
 
+
 def gen_wsi_feas(patch_model, img_dir, fea_dir, args):
     img_list = [ele for ele in os.listdir(img_dir) if "jpg" in ele]
     for ind, ele in enumerate(img_list):

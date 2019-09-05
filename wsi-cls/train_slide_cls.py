@@ -8,7 +8,7 @@ from torch.utils.data import DataLoader
 
 from wsinet import WsiNet
 from wsi_dataset import wsiDataSet
-from train_wsinet import train_cls
+from wsi_train_engine import train_cls
 
 
 def set_args():
