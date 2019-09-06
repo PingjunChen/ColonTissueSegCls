@@ -4,6 +4,7 @@ import os, sys
 import numpy as np
 import matplotlib.pyplot as plt
 import argparse, uuid, time
+from timeit import default_timer as timer
 from skimage import io, transform, morphology
 from collections import defaultdict
 import torch
@@ -12,14 +13,13 @@ from torch.autograd import Variable
 from torch.utils.data import DataLoader
 import torch.backends.cudnn as cudnn
 import torch.nn.functional as F
-from pydaily import filesystem
 
 import PIL
 PIL.Image.MAX_IMAGE_PIXELS = None
 import warnings
 warnings.simplefilter("ignore", UserWarning)
 import pydaily
-from timeit import default_timer as timer
+
 
 from segnet import pspnet
 from utils import wsi_stride_splitting,  gen_patch_wmap
@@ -30,10 +30,10 @@ def set_args():
     parser = argparse.ArgumentParser(description = 'Colon Tumor Slide Segmentation')
     parser.add_argument("--class_num",       type=int,   default=1)
     parser.add_argument("--in_channels",     type=int,   default=3)
-    parser.add_argument("--batch_size",      type=int,   default=8)
-    parser.add_argument("--stride_len",      type=int,   default=224)
+    parser.add_argument("--batch_size",      type=int,   default=32)
+    parser.add_argument("--stride_len",      type=int,   default=448)
     parser.add_argument("--patch_len",       type=int,   default=448)
-    parser.add_argument("--gpu",             type=str,   default="6, 7")
+    parser.add_argument("--gpu",             type=str,   default="4")
     parser.add_argument("--best_model",      type=str,   default="PSP-050-0.665.pth")
     parser.add_argument("--model_dir",       type=str,   default="../data/PatchSeg/BestModels")
     parser.add_argument("--slides_dir",      type=str,   default="../data/SlideSeg/TestPosSlides")
@@ -56,7 +56,7 @@ def test_slide_seg(args):
     model.eval()
 
     since = time.time()
-    filesystem.overwrite_dir(args.result_dir)
+    pydaily.filesystem.overwrite_dir(args.result_dir)
     slide_names = [ele for ele in os.listdir(args.slides_dir) if "jpg" in ele]
 
     ttl_pred_dice = 0.0
