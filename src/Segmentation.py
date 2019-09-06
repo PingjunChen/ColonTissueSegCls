@@ -202,7 +202,7 @@ def set_args():
     parser.add_argument('--fusion_mode',     type=str,  default="selfatt")
     parser.add_argument('--wsi_model_name',  type=str,  default="99-0.977.pth")
     parser.add_argument('--wsi_patch_num',   type=int,  default=12)
-    parser.add_argument('--gt_exist',        action='store_true', default=True)
+    parser.add_argument('--gt_exist',        action='store_true', default=False)
 
     args = parser.parse_args()
     return args
@@ -232,7 +232,7 @@ if __name__ == "__main__":
         pos_prob = cls_slide_img(patch_model, wsi_model, test_slide_path, args)
         if pos_prob >=  0.5:
             correct_num += 1
-
+        print("Positive probability: {:.3f}".format(pos_prob))
         end_time = timer()
         print("Takes {}".format(pydaily.tic.time_to_str(end_time-start_time, 'sec')))
 
