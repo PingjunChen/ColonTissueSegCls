@@ -51,8 +51,8 @@ def overlayWSI(wsi_path, coors, weights, alp=0.65):
     norm_weights = [ele / max_weight for ele in weights]
     for coor, weight in zip(coors, norm_weights):
         w_val = int(weight * 255)
-        h_s, w_s, h_e, w_e = coor
-        alpha[h_s:h_e, w_s:w_e] = w_val
+        h_s, w_s, h_len, w_len = coor
+        alpha[h_s:h_s+h_len, w_s:w_s+w_len] = w_val
 
     alpha = filters.gaussian(alpha, sigma=30)
     cmap = plt.get_cmap('jet')

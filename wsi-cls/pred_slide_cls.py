@@ -56,7 +56,7 @@ def gen_wsi_feas(patch_model, img_path, args):
         # image background control
         if patch.patch_bk_ratio(patch_img, bk_thresh=0.864) <= 0.88:
             patch_list.append(patch_img)
-            coor_list.append([start_h, start_w, start_h+args.patch_len, start_w+args.patch_len])
+            coor_list.append([start_h, start_w, args.patch_len, args.patch_len])
 
         # Processing the feature extraction in batch-wise manner to avoid huge memory consumption
         if len(patch_list) == args.batch_size or ind+1 == len(coors_arr):
@@ -89,7 +89,7 @@ def gen_wsi_feas(patch_model, img_path, args):
 def set_args():
     parser = argparse.ArgumentParser(description="Colon slides classification")
     parser.add_argument('--seed',          type=int,  default=1234)
-    parser.add_argument('--device_id',     type=str,  default="4",  help='which device')
+    parser.add_argument('--device_id',     type=str,  default="6",  help='which device')
     parser.add_argument('--img_dir',       type=str,  default="../data/SlideCLS/Split1234/SlideImgs/tissue-train-pos/val")
     parser.add_argument('--patch_model',   type=str,  default="../data/PatchCLS/Split1234/Models/resnet50/05-0.833.pth")
     parser.add_argument('--wsi_model_dir', type=str,  default="../data/SlideCLS/Split1234/WsiModels/resnet50")
@@ -100,7 +100,7 @@ def set_args():
     parser.add_argument('--patch_len',     type=int,  default=448)
     parser.add_argument('--batch_size',    type=int,  default=128)
     parser.add_argument('--test_patch_num',type=int,  default=12)
-    parser.add_argument('--save_overlay',  action='store_true', default=False)
+    parser.add_argument('--save_overlay',  action='store_true', default=True)
     args = parser.parse_args()
     return args
 
@@ -125,6 +125,9 @@ if __name__ == "__main__":
     # test slide
     test_slide_list = [ele for ele in os.listdir(args.img_dir) if "jpg" in ele]
     total_num = len(test_slide_list)
+    if args.save_overlay:
+        overlay_save_dir = os.path.join(os.path.dirname(args.img_dir), "overlay")
+        pydaily.filesystem.overwrite_dir(overlay_save_dir)
 
     correct_num = 0
     for ind, test_slide in enumerate(test_slide_list):
@@ -143,11 +146,8 @@ if __name__ == "__main__":
         if args.save_overlay:
             weights = assignments[0].data.cpu().tolist()
             overlay_wsi = overlayWSI(test_slide_path, chosen_coors, weights)
-            overlay_save_dir = os.path.join(os.path.dirname(args.img_dir), "overlay")
-            pydaily.filesystem.overwrite_dir(overlay_save_dir)
             io.imsave(os.path.join(overlay_save_dir, test_slide), overlay_wsi)
 
         end_time = timer()
         print("Takes {}".format(pydaily.tic.time_to_str(end_time-start_time, 'sec')))
-    print("stride-len: {} with batch-size: {}".format(args.stride_len, args.batch_size))
     print("Testing accuracy is {}/{}".format(correct_num, total_num))
