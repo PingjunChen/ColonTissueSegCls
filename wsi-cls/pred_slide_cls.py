@@ -16,6 +16,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.utils.data import DataLoader
 from torch.autograd import Variable
+
+
 from patch_loader import PatchDataset, wsi_stride_splitting
 from wsinet import WsiNet
 from utils import overlayWSI
@@ -94,7 +96,7 @@ def set_args():
     parser.add_argument('--fusion_mode',   type=str,  default="selfatt")
     parser.add_argument('--wsi_model_name',type=str,  default="epoch_099_acc_0.977_tn_080_fp_002_fn_001_tp_049.pth")
     parser.add_argument('--class_num',     type=int,  default=2)
-    parser.add_argument('--stride_len',    type=int,  default=224)
+    parser.add_argument('--stride_len',    type=int,  default=448)
     parser.add_argument('--patch_len',     type=int,  default=448)
     parser.add_argument('--batch_size',    type=int,  default=128)
     parser.add_argument('--test_patch_num',type=int,  default=12)
@@ -125,7 +127,9 @@ if __name__ == "__main__":
     total_num = len(test_slide_list)
 
     correct_num = 0
-    for test_slide in test_slide_list:
+    for ind, test_slide in enumerate(test_slide_list):
+        print("--{:2d}/{:2d} Slide:{}".format(ind+1, total_num, test_slide))
+        start_time = timer()
         test_slide_path = os.path.join(args.img_dir, test_slide)
         chosen_feas, chosen_num, chosen_coors = gen_wsi_feas(patch_model, test_slide_path, args)
         slide_fea_data = torch.from_numpy(chosen_feas).unsqueeze(0)
@@ -143,5 +147,7 @@ if __name__ == "__main__":
             pydaily.filesystem.overwrite_dir(overlay_save_dir)
             io.imsave(os.path.join(overlay_save_dir, test_slide), overlay_wsi)
 
-
+        end_time = timer()
+        print("Takes {}".format(pydaily.tic.time_to_str(end_time-start_time, 'sec')))
+    print("stride-len: {} with batch-size: {}".format(args.stride_len, args.batch_size))
     print("Testing accuracy is {}/{}".format(correct_num, total_num))
