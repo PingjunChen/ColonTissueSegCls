@@ -193,8 +193,8 @@ def set_args():
     parser.add_argument('--stride_len',      type=int,  default=448)
     parser.add_argument('--patch_len',       type=int,  default=448)
 
-    parser.add_argument('--input_dir',       type=str,  default="./data/inputs")
-    parser.add_argument('--output_dir',      type=str,  default="./data/outputs")
+    parser.add_argument('--input_dir',       type=str,  default="../input")
+    parser.add_argument('--output_dir',      type=str,  default="../output")
     parser.add_argument('--model_dir',       type=str,  default="./Models")
     parser.add_argument("--best_seg_model",  type=str,  default="PSP-050-0.665.pth")
     parser.add_argument('--cnn_model',       type=str,  default="resnet50")
