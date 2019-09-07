@@ -214,6 +214,9 @@ if __name__ == "__main__":
     args = set_args()
     os.environ["CUDA_VISIBLE_DEVICES"] = str(args.device_id)
 
+    if torch.cuda.is_available() == False:
+        raise Exception("CUDA settings error")
+
     # load models
     seg_model = load_seg_model(args)
     patch_model = load_patch_model(args)
