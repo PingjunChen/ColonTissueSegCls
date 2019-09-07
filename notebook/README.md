@@ -21,10 +21,10 @@ $ docker images
 
 ## Start container
 ```
-$ docker run -it --name ColonSeg --restart always -v ~/CPath/colon-tissue-seg:/App colon
-$ docker run -dit --name chenpingjun --restart always -v /home/pingjun/CPath/colon-tissue-seg/DigestPath/data/input:/input:ro -v /output digestpath:chenpingjun
+$ docker run -it --name chenpingjun --restart always -v ~/CPath/colon-tissue-seg:/App digestpath:chenpingjun
 $ docker run -dit --runtime nvidia  --shm-size=256g --name chenpingjun --restart always -v /home/pingjun/CPath/colon-tissue-seg/DigestPath/data/input:/input:ro -v /output digestpath:chenpingjun
 $ docker exec -it chenpingjun /bin/bash
+$ docker exec -u 0 -it chenpingjun /bin/bash
 $ docker exec -it chenpingjun python /digestpath/Segmentation.py
 
 ```
@@ -36,6 +36,6 @@ $ docker ps
 
 ## Stop container
 ```
-$ docker stop ColonSeg
-$ docker rm ColonSeg
+$ docker stop chenpingjun
+$ docker rm chenpingjun
 ```
