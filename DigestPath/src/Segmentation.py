@@ -104,7 +104,7 @@ def seg_slide_img(seg_model, slide_path, args):
             pred_dice = np.sum(intersection) / (np.sum(mask_img)+np.sum(slide_pred)-np.sum(intersection) + 1.0e-8)
             print("Dice: {:.3f}".format(pred_dice))
 
-    pred_save_path = os.path.join(args.output_dir, slide_name+".png")
+    pred_save_path = os.path.join(args.output_dir, "predictions", os.path.basename(slide_path))
     io.imsave(pred_save_path, slide_pred*255)
 
 
@@ -202,7 +202,7 @@ def set_args():
     parser.add_argument('--fusion_mode',     type=str,  default="selfatt")
     parser.add_argument('--wsi_model_name',  type=str,  default="99-0.977.pth")
     parser.add_argument('--wsi_patch_num',   type=int,  default=12)
-    parser.add_argument('--gt_exist',        action='store_true', default=False)
+    parser.add_argument('--gt_exist',        action='store_true', default=True)
 
     args = parser.parse_args()
     return args
@@ -220,8 +220,9 @@ if __name__ == "__main__":
     # start analysis
     correct_num =  0
     since = time.time()
-    pydaily.filesystem.overwrite_dir(args.output_dir)
+    pydaily.filesystem.overwrite_dir(os.path.join(args.output_dir, "predictions"))
     slide_names = [ele for ele in os.listdir(args.input_dir) if "jpg" in ele]
+    score_list = []
 
     for num, cur_slide in enumerate(slide_names):
         print("--{:2d}/{:2d} Slide:{}".format(num+1, len(slide_names), cur_slide))
@@ -230,11 +231,17 @@ if __name__ == "__main__":
         # segmentation
         seg_slide_img(seg_model, test_slide_path, args)
         pos_prob = cls_slide_img(patch_model, wsi_model, test_slide_path, args)
+        score_list.append(pos_prob)
         if pos_prob >=  0.5:
             correct_num += 1
         print("Positive probability: {:.3f}".format(pos_prob))
         end_time = timer()
         print("Takes {}".format(pydaily.tic.time_to_str(end_time-start_time, 'sec')))
+
+    pred_dict = {}
+    pred_dict["image_name"] = slide_names
+    pred_dict["score"] = score_list
+    pred_csv_path = os.path.join(args.output_dir, "predict.csv")
 
     time_elapsed = time.time() - since
     print("Testing takes {:.0f}m {:.2f}s".format(time_elapsed // 60, time_elapsed % 60))
