@@ -89,7 +89,7 @@ def gen_wsi_feas(patch_model, img_path, args):
 def set_args():
     parser = argparse.ArgumentParser(description="Colon slides classification")
     parser.add_argument('--seed',          type=int,  default=1234)
-    parser.add_argument('--device_id',     type=str,  default="6",  help='which device')
+    parser.add_argument('--device_id',     type=str,  default="7",  help='which device')
     parser.add_argument('--img_dir',       type=str,  default="../data/SlideCLS/Split1234/SlideImgs/tissue-train-pos/val")
     parser.add_argument('--patch_model',   type=str,  default="../data/PatchCLS/Split1234/Models/resnet50/05-0.833.pth")
     parser.add_argument('--wsi_model_dir', type=str,  default="../data/SlideCLS/Split1234/WsiModels/resnet50")
@@ -126,7 +126,7 @@ if __name__ == "__main__":
     test_slide_list = [ele for ele in os.listdir(args.img_dir) if "jpg" in ele]
     total_num = len(test_slide_list)
     if args.save_overlay:
-        overlay_save_dir = os.path.join(os.path.dirname(args.img_dir), "overlay")
+        overlay_save_dir = os.path.join(os.path.dirname(args.img_dir), "overlay"+str(args.test_patch_num))
         pydaily.filesystem.overwrite_dir(overlay_save_dir)
 
     correct_num = 0
