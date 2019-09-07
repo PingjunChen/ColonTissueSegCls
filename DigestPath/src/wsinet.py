@@ -8,27 +8,6 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
-def get_mask(B, N, true_num=None):
-    '''
-    Parameters:
-    ------------
-        B@int: batch size
-        N@int: length of N
-        true_num: np array of int, of shape (B,)
-    Returns:
-    ------------
-        mask: of type np.bool, of shape (B, N). 1 indicates valid, 0 invalid.
-    '''
-    dis_ = np.ones((B, N), dtype=np.int32)
-
-    if true_num is not None:
-        for idx in range(B):
-            this_num = true_num[idx]
-            if this_num < N:
-                dis_[idx, this_num::] = 0
-    return dis_
-
-
 class MILAtten(nn.Module):
     """MILAtten layer implementation"""
     def __init__(self, dim=2048, dl=128):
@@ -71,10 +50,7 @@ class MILAtten(nn.Module):
         '''
 
         B, num_dis, D = x.size()
-        if true_num is not None:
-            _mask  = get_mask(B, num_dis, true_num)
-        else:
-            _mask  = np.ones((B, num_dis), dtype=np.int32)
+        _mask  = np.ones((B, num_dis), dtype=np.int32)
         device_mask = x.new_tensor(_mask)
 
         feat_ = x

@@ -209,41 +209,39 @@ def set_args():
 
 
 if __name__ == "__main__":
-    print("Test Docker")
-    # args = set_args()
-    # os.environ["CUDA_VISIBLE_DEVICES"] = str(args.device_id)
-    #
-    # # load models
-    # seg_model = load_seg_model(args)
-    # patch_model = load_patch_model(args)
-    # wsi_model = load_wsi_model(args)
-    #
-    # # start analysis
-    # correct_num =  0
-    # since = time.time()
-    # pydaily.filesystem.overwrite_dir(os.path.join(args.output_dir, "predictions"))
-    # slide_names = [ele for ele in os.listdir(args.input_dir) if "jpg" in ele]
-    # score_list = []
-    #
-    # for num, cur_slide in enumerate(slide_names):
-    #     print("--{:2d}/{:2d} Slide:{}".format(num+1, len(slide_names), cur_slide))
-    #     start_time = timer()
-    #     test_slide_path = os.path.join(args.input_dir, cur_slide)
-    #     # segmentation
-    #     seg_slide_img(seg_model, test_slide_path, args)
-    #     pos_prob = cls_slide_img(patch_model, wsi_model, test_slide_path, args)
-    #     score_list.append(pos_prob)
-    #     if pos_prob >=  0.5:
-    #         correct_num += 1
-    #     print("Positive probability: {:.3f}".format(pos_prob))
-    #     end_time = timer()
-    #     print("Takes {}".format(pydaily.tic.time_to_str(end_time-start_time, 'sec')))
-    #
-    # pred_dict = {}
-    # pred_dict["image_name"] = slide_names
-    # pred_dict["score"] = score_list
-    # pred_csv_path = os.path.join(args.output_dir, "predict.csv")
-    #
-    # time_elapsed = time.time() - since
-    # print("Testing takes {:.0f}m {:.2f}s".format(time_elapsed // 60, time_elapsed % 60))
-    # print("Testing accuracy is {}/{}".format(correct_num, len(slide_names)))
+    print("Start testing...")
+
+    args = set_args()
+    os.environ["CUDA_VISIBLE_DEVICES"] = str(args.device_id)
+
+    # load models
+    seg_model = load_seg_model(args)
+    patch_model = load_patch_model(args)
+    wsi_model = load_wsi_model(args)
+
+    # start analysis
+    since = time.time()
+    pydaily.filesystem.overwrite_dir(os.path.join(args.output_dir, "predictions"))
+    slide_names = [ele for ele in os.listdir(args.input_dir) if "jpg" in ele]
+    score_list = []
+
+    for num, cur_slide in enumerate(slide_names):
+        print("--{:2d}/{:2d} Slide:{}".format(num+1, len(slide_names), cur_slide))
+        start_time = timer()
+        test_slide_path = os.path.join(args.input_dir, cur_slide)
+        # segmentation
+        seg_slide_img(seg_model, test_slide_path, args)
+        pos_prob = cls_slide_img(patch_model, wsi_model, test_slide_path, args)
+        score_list.append(pos_prob)
+        print("Positive probability: {:.3f}".format(pos_prob))
+        end_time = timer()
+        print("Takes {}".format(pydaily.tic.time_to_str(end_time-start_time, 'sec')))
+
+    pred_dict = {}
+    pred_dict["image_name"] = slide_names
+    pred_dict["score"] = score_list
+    pred_csv_path = os.path.join(args.output_dir, "predict.csv")
+    pydaily.format.dict_to_csv(pred_dict, pred_csv_path)
+
+    time_elapsed = time.time() - since
+    print("Testing takes {:.0f}m {:.2f}s".format(time_elapsed // 60, time_elapsed % 60))
