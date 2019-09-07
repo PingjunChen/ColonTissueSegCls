@@ -183,7 +183,7 @@ def cls_slide_img(patch_model, wsi_model, slide_path, args):
 def set_args():
     parser = argparse.ArgumentParser(description = 'Colon Tumor Slide Segmentation')
     parser.add_argument("--seed",            type=int,  default=1234)
-    parser.add_argument('--device_id',       type=str,  default="4",  help='which device')
+    parser.add_argument('--device_id',       type=str,  default="0",  help='which device')
 
     parser.add_argument("--in_channels",     type=int,  default=3)
     parser.add_argument("--seg_class_num",   type=int,  default=1)
@@ -193,8 +193,8 @@ def set_args():
     parser.add_argument('--stride_len',      type=int,  default=448)
     parser.add_argument('--patch_len',       type=int,  default=448)
 
-    parser.add_argument('--input_dir',       type=str,  default="../input")
-    parser.add_argument('--output_dir',      type=str,  default="../output")
+    parser.add_argument('--input_dir',       type=str,  default="/input")
+    parser.add_argument('--output_dir',      type=str,  default="/output")
     parser.add_argument('--model_dir',       type=str,  default="./Models")
     parser.add_argument("--best_seg_model",  type=str,  default="PSP-050-0.665.pth")
     parser.add_argument('--cnn_model',       type=str,  default="resnet50")
@@ -209,40 +209,41 @@ def set_args():
 
 
 if __name__ == "__main__":
-    args = set_args()
-    os.environ["CUDA_VISIBLE_DEVICES"] = str(args.device_id)
-
-    # load models
-    seg_model = load_seg_model(args)
-    patch_model = load_patch_model(args)
-    wsi_model = load_wsi_model(args)
-
-    # start analysis
-    correct_num =  0
-    since = time.time()
-    pydaily.filesystem.overwrite_dir(os.path.join(args.output_dir, "predictions"))
-    slide_names = [ele for ele in os.listdir(args.input_dir) if "jpg" in ele]
-    score_list = []
-
-    for num, cur_slide in enumerate(slide_names):
-        print("--{:2d}/{:2d} Slide:{}".format(num+1, len(slide_names), cur_slide))
-        start_time = timer()
-        test_slide_path = os.path.join(args.input_dir, cur_slide)
-        # segmentation
-        seg_slide_img(seg_model, test_slide_path, args)
-        pos_prob = cls_slide_img(patch_model, wsi_model, test_slide_path, args)
-        score_list.append(pos_prob)
-        if pos_prob >=  0.5:
-            correct_num += 1
-        print("Positive probability: {:.3f}".format(pos_prob))
-        end_time = timer()
-        print("Takes {}".format(pydaily.tic.time_to_str(end_time-start_time, 'sec')))
-
-    pred_dict = {}
-    pred_dict["image_name"] = slide_names
-    pred_dict["score"] = score_list
-    pred_csv_path = os.path.join(args.output_dir, "predict.csv")
-
-    time_elapsed = time.time() - since
-    print("Testing takes {:.0f}m {:.2f}s".format(time_elapsed // 60, time_elapsed % 60))
-    print("Testing accuracy is {}/{}".format(correct_num, len(slide_names)))
+    print("Test Docker")
+    # args = set_args()
+    # os.environ["CUDA_VISIBLE_DEVICES"] = str(args.device_id)
+    #
+    # # load models
+    # seg_model = load_seg_model(args)
+    # patch_model = load_patch_model(args)
+    # wsi_model = load_wsi_model(args)
+    #
+    # # start analysis
+    # correct_num =  0
+    # since = time.time()
+    # pydaily.filesystem.overwrite_dir(os.path.join(args.output_dir, "predictions"))
+    # slide_names = [ele for ele in os.listdir(args.input_dir) if "jpg" in ele]
+    # score_list = []
+    #
+    # for num, cur_slide in enumerate(slide_names):
+    #     print("--{:2d}/{:2d} Slide:{}".format(num+1, len(slide_names), cur_slide))
+    #     start_time = timer()
+    #     test_slide_path = os.path.join(args.input_dir, cur_slide)
+    #     # segmentation
+    #     seg_slide_img(seg_model, test_slide_path, args)
+    #     pos_prob = cls_slide_img(patch_model, wsi_model, test_slide_path, args)
+    #     score_list.append(pos_prob)
+    #     if pos_prob >=  0.5:
+    #         correct_num += 1
+    #     print("Positive probability: {:.3f}".format(pos_prob))
+    #     end_time = timer()
+    #     print("Takes {}".format(pydaily.tic.time_to_str(end_time-start_time, 'sec')))
+    #
+    # pred_dict = {}
+    # pred_dict["image_name"] = slide_names
+    # pred_dict["score"] = score_list
+    # pred_csv_path = os.path.join(args.output_dir, "predict.csv")
+    #
+    # time_elapsed = time.time() - since
+    # print("Testing takes {:.0f}m {:.2f}s".format(time_elapsed // 60, time_elapsed % 60))
+    # print("Testing accuracy is {}/{}".format(correct_num, len(slide_names)))

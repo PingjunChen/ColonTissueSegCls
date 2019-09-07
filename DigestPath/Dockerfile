@@ -1,17 +1,19 @@
 FROM nvidia/cuda:9.0-base-ubuntu16.04
-RUN apt-get update && apt-get install -y --no-install-recommends \
-	curl sudo build-essential git \
+RUN apt-get update && apt-get install -y --no-install-recommends build-essential \
+	curl sudo  git \
+	openslide-tools libgeos-dev \
+	libsm6 libxext6 libxrender-dev \
  && rm -rf /var/lib/apt/lists/*
 
 
 # Create a working directory
-RUN mkdir /App
-COPY ~/CPath/colon-tissue-seg /App/colon-analysis
-WORKDIR /App/colon-analysis
+RUN mkdir /digestpath
+COPY src /digestpath/
+WORKDIR /digestpath
 
 # Create a non-root user and switch to it
 RUN adduser --disabled-password --gecos '' --shell /bin/bash chenpingjun \
- && chown -R chenpingjun:chenpingjun /App
+ && chown -R chenpingjun:chenpingjun /digestpath
 RUN echo "chenpingjun ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/90-chenpingjun
 USER chenpingjun
 ENV HOME=/home/chenpingjun
@@ -45,6 +47,8 @@ RUN conda install -y -c pytorch cuda90=1.0 magma-cuda90=2.4.0 \
 
 # PIP packages
 RUN pip install --upgrade pip && \
-    pip install --upgrade setuptools
+    pip install --upgrade setuptools \
+	pip install google-cloud \
+	pip install google-cloud-vision
 COPY requirements.txt /tmp/
 RUN pip install --upgrade --ignore-installed -r /tmp/requirements.txt
