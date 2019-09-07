@@ -9,3 +9,5 @@ pydaily==0.4.0
 pycontour==1.4.0
 numba==0.45.1
 pyslide==0.4.1
+google-cloud==0.34.0
+google-cloud-vision==0.39.0

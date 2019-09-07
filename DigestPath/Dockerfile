@@ -47,8 +47,6 @@ RUN conda install -y -c pytorch cuda90=1.0 magma-cuda90=2.4.0 \
 
 # PIP packages
 RUN pip install --upgrade pip && \
-    pip install --upgrade setuptools \
-	pip install google-cloud \
-	pip install google-cloud-vision
-COPY requirements.txt /tmp/
-RUN pip install --upgrade --ignore-installed -r /tmp/requirements.txt
+    pip install --upgrade setuptools 
+COPY requirements.txt /digestpath
+RUN pip install --upgrade --ignore-installed -r /digestpath/requirements.txt
