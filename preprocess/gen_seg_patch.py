@@ -63,6 +63,6 @@ def gen_patches(img_dir, patch_dir, patch_size=448):
 
 
 if __name__ == "__main__":
-    img_dir = "/media/pingjun/CPATHOLOGY/Segmentation/ColonData/Split1234/Pos/train"
-    patch_dir = "/media/pingjun/CPATHOLOGY/Segmentation/ColonData/Split1234/SegPatches/train"
+    img_dir = "/media/pingjun/CPATHOLOGY/Segmentation/ColonData/Split1235/Pos/val"
+    patch_dir = "/media/pingjun/CPATHOLOGY/Segmentation/ColonData/Split1235/SegPatches/val"
     gen_patches(img_dir, patch_dir, patch_size=448)

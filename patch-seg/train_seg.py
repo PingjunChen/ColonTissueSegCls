@@ -42,10 +42,10 @@ def set_args():
     parser.add_argument("--model_dir",       type=str,   default="../data/PatchSeg/Models")
     parser.add_argument("--model_name",      type=str,   default="PSP")
     parser.add_argument("--init_lr",         type=float, default=1.0e-3)
-    parser.add_argument("--maxepoch",        type=int,   default=50,     help="number of epochs to train")
-    parser.add_argument("--batch_size",      type=int,   default=8,      help="batch size")
-    parser.add_argument("--gpu",             type=str,   default="2, 3", help="training gpu")
-    parser.add_argument("--session",         type=str,   default="01",   help="training session")
+    parser.add_argument("--maxepoch",        type=int,   default=50,        help="number of epochs to train")
+    parser.add_argument("--batch_size",      type=int,   default=12,        help="batch size")
+    parser.add_argument("--gpu",             type=str,   default="1, 2, 3", help="training gpu")
+    parser.add_argument("--session",         type=str,   default="01",      help="training session")
     args = parser.parse_args()
     return args
 
