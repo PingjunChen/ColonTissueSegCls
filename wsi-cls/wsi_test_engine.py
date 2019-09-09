@@ -12,7 +12,7 @@ from wsinet import WsiNet
 
 
 def load_wsinet(args):
-    wsinet = WsiNet(class_num=2, in_channels=2048, mode=args.fusion_mode)
+    wsinet = WsiNet(class_num=2, in_channels=args.fea_len, mode=args.fusion_mode)
     weightspath = os.path.join(args.model_dir, args.cnn_model, args.fusion_mode, args.wsi_cls_name)
     wsi_weights_dict = torch.load(weightspath, map_location=lambda storage, loc: storage)
     wsinet.load_state_dict(wsi_weights_dict)

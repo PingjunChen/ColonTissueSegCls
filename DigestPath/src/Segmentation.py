@@ -50,7 +50,7 @@ def load_patch_model(args):
 
 
 def load_wsi_model(args):
-    wsi_model = WsiNet(class_num=args.wsi_class_num, in_channels=2048, mode=args.fusion_mode)
+    wsi_model = WsiNet(class_num=args.wsi_class_num, in_channels=args.fea_len, mode=args.fusion_mode)
     wsi_weights_path = os.path.join(args.model_dir, "wsiBestModel", args.cnn_model,
                                     args.fusion_mode, args.wsi_model_name)
     wsi_weights_dict = torch.load(wsi_weights_path, map_location=lambda storage, loc: storage)
@@ -105,23 +105,33 @@ def seg_slide_img(seg_model, slide_path, args):
 
     pred_save_path = os.path.join(args.output_dir, "predictions", os.path.basename(slide_path))
     io.imsave(pred_save_path, slide_pred*255)
+    
 
+def extract_model_feas(patch_model, input_tensor, args):
+    if args.model_name == "resnet50":
+        x = patch_model.conv1(input_tensor)
+        x = patch_model.bn1(x)
+        x = patch_model.relu(x)
+        x = patch_model.maxpool(x)
 
-def extract_model_feas(patch_model, input_tensor):
-    x = patch_model.conv1(input_tensor)
-    x = patch_model.bn1(x)
-    x = patch_model.relu(x)
-    x = patch_model.maxpool(x)
+        x = patch_model.layer1(x)
+        x = patch_model.layer2(x)
+        x = patch_model.layer3(x)
+        x = patch_model.layer4(x)
 
-    x = patch_model.layer1(x)
-    x = patch_model.layer2(x)
-    x = patch_model.layer3(x)
-    x = patch_model.layer4(x)
-
-    x = patch_model.avgpool(x)
-    feas = torch.flatten(x, 1)
-    logits = patch_model.fc(feas)
-    probs = F.softmax(logits, dim=1)
+        x = patch_model.avgpool(x)
+        feas = torch.flatten(x, 1)
+        logits = patch_model.fc(feas)
+        probs = F.softmax(logits, dim=1)
+    elif args.model_name == "vgg16bn":
+        x = patch_model.features(input_tensor)
+        x = patch_model.avgpool(x)
+        x = torch.flatten(x, 1)
+        feas = patch_model.classifier[:4](x)
+        logits = patch_model.classifier[4:](feas)
+        probs = F.softmax(logits, dim=-1)
+    else:
+        raise AssertionError("Unknown model name {}".format(args.model_name))
 
     return feas, probs
 
@@ -150,7 +160,7 @@ def gen_wsi_feas(patch_model, img_path, args):
             with torch.no_grad():
                 for inputs in patch_loader:
                     batch_tensor = Variable(inputs.cuda())
-                    feas, probs = extract_model_feas(patch_model, batch_tensor)
+                    feas, probs = extract_model_feas(patch_model, batch_tensor, args)
                     batch_feas = feas.cpu().data.numpy().tolist()
                     batch_probs = probs.cpu().data.numpy().tolist()
                     feas_list.extend(batch_feas)
@@ -197,6 +207,7 @@ def set_args():
     parser.add_argument('--model_dir',       type=str,  default="./Models")
     parser.add_argument("--best_seg_model",  type=str,  default="PSP-050-0.665.pth")
     parser.add_argument('--cnn_model',       type=str,  default="resnet50")
+    parser.add_argument('--fea_len',         type=int,  default=2048)
     parser.add_argument('--best_patch_model',type=str,  default="05-0.833.pth")
     parser.add_argument('--fusion_mode',     type=str,  default="selfatt")
     parser.add_argument('--wsi_model_name',  type=str,  default="99-0.977.pth")

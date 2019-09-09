@@ -17,24 +17,33 @@ from torch.autograd import Variable
 from patch_loader import PatchDataset, wsi_stride_splitting
 
 
-def extract_model_feas(patch_model, input_tensor):
-    x = patch_model.conv1(input_tensor)
-    x = patch_model.bn1(x)
-    x = patch_model.relu(x)
-    x = patch_model.maxpool(x)
+def extract_model_feas(patch_model, input_tensor, args):
+    if args.model_name == "resnet50":
+        x = patch_model.conv1(input_tensor)
+        x = patch_model.bn1(x)
+        x = patch_model.relu(x)
+        x = patch_model.maxpool(x)
 
-    x = patch_model.layer1(x)
-    x = patch_model.layer2(x)
-    x = patch_model.layer3(x)
-    x = patch_model.layer4(x)
+        x = patch_model.layer1(x)
+        x = patch_model.layer2(x)
+        x = patch_model.layer3(x)
+        x = patch_model.layer4(x)
 
-    x = patch_model.avgpool(x)
-    feas = torch.flatten(x, 1)
-    logits = patch_model.fc(feas)
-    probs = F.softmax(logits, dim=1)
+        x = patch_model.avgpool(x)
+        feas = torch.flatten(x, 1)
+        logits = patch_model.fc(feas)
+        probs = F.softmax(logits, dim=1)
+    elif args.model_name == "vgg16bn":
+        x = patch_model.features(input_tensor)
+        x = patch_model.avgpool(x)
+        x = torch.flatten(x, 1)
+        feas = patch_model.classifier[:4](x)
+        logits = patch_model.classifier[4:](feas)
+        probs = F.softmax(logits, dim=-1)
+    else:
+        raise AssertionError("Unknown model name {}".format(args.model_name))
 
     return feas, probs
-
 
 def gen_wsi_feas(patch_model, img_dir, fea_dir, args):
     img_list = [ele for ele in os.listdir(img_dir) if "jpg" in ele]
@@ -64,7 +73,7 @@ def gen_wsi_feas(patch_model, img_dir, fea_dir, args):
                 with torch.no_grad():
                     for inputs in patch_loader:
                         batch_tensor = Variable(inputs.cuda())
-                        feas, probs = extract_model_feas(patch_model, batch_tensor)
+                        feas, probs = extract_model_feas(patch_model, batch_tensor, args)
                         batch_feas = feas.cpu().data.numpy().tolist()
                         batch_probs = probs.cpu().data.numpy().tolist()
                         feas_list.extend(batch_feas)
@@ -93,12 +102,12 @@ def gen_wsi_feas(patch_model, img_dir, fea_dir, args):
 
 def set_args():
     parser = argparse.ArgumentParser(description="WSI patch-based feature extraction")
-    parser.add_argument('--img_dir',       type=str,  default="../data/SlideCLS/Split1235/SlideImgs/tissue-train-pos/train")
-    parser.add_argument('--fea_dir',       type=str,  default="../data/SlideCLS/Split1235/SlideFeas/resnet50/train/1Pos")
+    parser.add_argument('--img_dir',       type=str,  default="../data/SlideCLS/Split1235/SlideImgs/tissue-train-neg/train")
+    parser.add_argument('--fea_dir',       type=str,  default="../data/SlideCLS/Split1235/SlideFeas/vgg16bn/train/0Neg")
     parser.add_argument('--model_dir',     type=str,  default="../data/PatchCLS/Split1235/Models")
-    parser.add_argument('--model_name',    type=str,  default="resnet50")
-    parser.add_argument('--patch_cls_name',type=str,  default="04-0.897.pth")
-    parser.add_argument('--device_id',     type=str,  default="1",  help='which device')
+    parser.add_argument('--model_name',    type=str,  default="vgg16bn")
+    parser.add_argument('--patch_cls_name',type=str,  default="05-0.909.pth")
+    parser.add_argument('--device_id',     type=str,  default="7",  help='which device')
     parser.add_argument('--class_num',     type=int,  default=2)
     parser.add_argument('--patch_len',     type=int,  default=448)
     parser.add_argument('--stride_len',    type=int,  default=256)

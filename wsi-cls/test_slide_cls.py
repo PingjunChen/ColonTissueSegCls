@@ -18,6 +18,7 @@ def set_args():
     parser.add_argument('--batch_size',      type=int,          default=16,         help='batch size.')
     parser.add_argument('--device_id',       type=str,          default="7",        help='which device')
     parser.add_argument('--cnn_model',       type=str,          default="resnet50", help='cnn model')
+    parser.add_argument('--fea_len',         type=int,          default=4096)    
     parser.add_argument('--fusion_mode',     type=str,          default="selfatt")
     parser.add_argument('--wsi_cls_name',    type=str,          default="epoch_030_acc_0.985_tn_080_fp_002_fn_000_tp_050.pth")
 
