@@ -64,6 +64,7 @@ def load_wsi_model(args):
 def seg_slide_img(seg_model, slide_path, args):
     slide_img = io.imread(slide_path)
     coors_arr = wsi_stride_splitting(slide_img.shape[0], slide_img.shape[1], patch_len=args.patch_len, stride_len=args.stride_len)
+    print("h: {} w: {}".format(slide_img.shape[0], slide_img.shape[1]))
     wmap = np.zeros((slide_img.shape[0], slide_img.shape[1]), dtype=np.int32)
     pred_map = np.zeros_like(wmap).astype(np.float32)
 
@@ -105,7 +106,7 @@ def seg_slide_img(seg_model, slide_path, args):
 
     pred_save_path = os.path.join(args.output_dir, "predictions", os.path.basename(slide_path))
     io.imsave(pred_save_path, slide_pred*255)
-    
+
 
 def extract_model_feas(patch_model, input_tensor, args):
     if args.model_name == "resnet50":
@@ -206,11 +207,11 @@ def set_args():
     parser.add_argument('--output_dir',      type=str,  default="/output")
     parser.add_argument('--model_dir',       type=str,  default="./Models")
     parser.add_argument("--best_seg_model",  type=str,  default="PSP-050-0.665.pth")
-    parser.add_argument('--cnn_model',       type=str,  default="resnet50")
-    parser.add_argument('--fea_len',         type=int,  default=2048)
-    parser.add_argument('--best_patch_model',type=str,  default="05-0.833.pth")
+    parser.add_argument('--cnn_model',       type=str,  default="vgg16bn")
+    parser.add_argument('--fea_len',         type=int,  default=4096)
+    parser.add_argument('--best_patch_model',type=str,  default="1235-05-0.909.pth")
     parser.add_argument('--fusion_mode',     type=str,  default="selfatt")
-    parser.add_argument('--wsi_model_name',  type=str,  default="99-0.977.pth")
+    parser.add_argument('--wsi_model_name',  type=str,  default="1235-64-0.985.pth")
     parser.add_argument('--wsi_patch_num',   type=int,  default=12)
     parser.add_argument('--gt_exist',        action='store_true', default=True)
 
@@ -246,7 +247,7 @@ if __name__ == "__main__":
         seg_slide_img(seg_model, test_slide_path, args)
         pos_prob = cls_slide_img(patch_model, wsi_model, test_slide_path, args)
         score_list.append(pos_prob)
-        print("Positive probability: {:.3f}".format(pos_prob))
+        # print("Positive probability: {:.3f}".format(pos_prob))
         end_time = timer()
         print("Takes {}".format(pydaily.tic.time_to_str(end_time-start_time, 'sec')))
 
