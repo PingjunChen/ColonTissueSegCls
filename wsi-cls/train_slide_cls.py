@@ -14,7 +14,7 @@ from wsi_train_engine import train_cls
 def set_args():
     # Arguments setting
     parser = argparse.ArgumentParser(description="Colon image classification")
-    parser.add_argument('--data_dir',        type=str,          default="../data/SlideCLS/Split1235")
+    parser.add_argument('--data_dir',        type=str,          default="../data/SlideCLS/Split1234")
     parser.add_argument('--patch_model',     type=str,          default="vgg16bn")
     parser.add_argument('--fea_len',         type=int,          default=4096)
     parser.add_argument('--batch_size',      type=int,          default=32,      help='batch size.')
