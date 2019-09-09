@@ -23,7 +23,6 @@ from pyslide import patch
 
 from segnet import pspnet
 from utils import wsi_stride_splitting
-# from utils import gen_patch_wmap
 from patch_loader import SegPatchDataset, ClsPatchDataset
 from wsinet import WsiNet
 
@@ -188,8 +187,8 @@ def set_args():
     parser.add_argument("--in_channels",     type=int,  default=3)
     parser.add_argument("--seg_class_num",   type=int,  default=1)
     parser.add_argument('--wsi_class_num',   type=int,  default=2)
-    parser.add_argument("--seg_batch_size",  type=int,  default=32)
-    parser.add_argument('--cls_batch_size',  type=int,  default=128)
+    parser.add_argument("--seg_batch_size",  type=int,  default=48)
+    parser.add_argument('--cls_batch_size',  type=int,  default=160)
     parser.add_argument('--stride_len',      type=int,  default=448)
     parser.add_argument('--patch_len',       type=int,  default=448)
 
