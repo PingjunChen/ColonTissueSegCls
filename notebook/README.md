@@ -22,8 +22,7 @@ $ docker images
 ## Start container
 ```
 $ docker run -it --name chenpingjun --restart always -v ~/CPath/colon-tissue-seg:/App digestpath:chenpingjun
-$ docker run -dit --runtime nvidia  --shm-size=16G --restart always --name chenpingjun -v /home/pingjun/CPath/colon-tissue-seg/DigestPath/data/input:/input:ro -v /output digestpath:chenpingjun
-$ cd
+$ docker run -dit --runtime nvidia  --shm-size=64G --restart always --name chenpingjun -v /home/pingjun/CPath/colon-tissue-seg/DigestPath/data/input:/input:ro -v /output digestpath:chenpingjun
 $ docker exec -u 0 -it chenpingjun /bin/bash
 $ docker exec -it chenpingjun python /digestpath/Segmentation.py
 ```

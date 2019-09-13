@@ -38,22 +38,28 @@ def set_args():
     parser.add_argument("--seed",            type=int,   default=1234,   help="training seed")
     parser.add_argument("--class_num",       type=int,   default=1)
     parser.add_argument("--in_channels",     type=int,   default=3,      help="input channel number")
-    parser.add_argument("--data_dir",        type=str,   default="../data/PatchSeg/SegPatches")
-    parser.add_argument("--model_dir",       type=str,   default="../data/PatchSeg/Models")
-    parser.add_argument("--model_name",      type=str,   default="PSP")
+    parser.add_argument("--data_dir",        type=str,   default="../data/PatchSeg/SegPatches1234")
+    parser.add_argument("--model_dir",       type=str,   default="../data/PatchSeg/Model1234")
+    parser.add_argument("--model_name",      type=str,   default="UNet")
     parser.add_argument("--init_lr",         type=float, default=1.0e-3)
     parser.add_argument("--maxepoch",        type=int,   default=50,        help="number of epochs to train")
-    parser.add_argument("--batch_size",      type=int,   default=12,        help="batch size")
+    parser.add_argument("--batch_size",      type=int,   default=18,        help="batch size")
     parser.add_argument("--gpu",             type=str,   default="1, 2, 3", help="training gpu")
-    parser.add_argument("--session",         type=str,   default="01",      help="training session")
+    parser.add_argument("--session",         type=str,   default="02",      help="training session")
     args = parser.parse_args()
     return args
 
 
 def train_seg_model(args):
-    model = pspnet.PSPNet(n_classes=19, input_size=(448, 448))
-    model.load_pretrained_model(model_path="./segnet/pspnet/pspnet101_cityscapes.caffemodel")
-    model.classification = nn.Conv2d(512, args.class_num, kernel_size=1)
+    if args.model_name == "UNet":
+        model = UNet(n_channels=args.in_channels, n_classes=args.class_num)
+    elif args.model_name == "PSP":
+        model = pspnet.PSPNet(n_classes=19, input_size=(448, 448))
+        model.load_pretrained_model(model_path="./segnet/pspnet/pspnet101_cityscapes.caffemodel")
+        model.classification = nn.Conv2d(512, args.class_num, kernel_size=1)
+    else:
+        raise NotImplemented("Unknown model {}".format(args.model_name))
+
     model.cuda()
     model = nn.DataParallel(model)
 

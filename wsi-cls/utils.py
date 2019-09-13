@@ -54,7 +54,7 @@ def overlayWSI(wsi_path, coors, weights, alp=0.65):
         h_s, w_s, h_len, w_len = coor
         alpha[h_s:h_s+h_len, w_s:w_s+w_len] = w_val
 
-    alpha = filters.gaussian(alpha, sigma=30)
+    alpha = filters.gaussian(alpha, sigma=60)
     cmap = plt.get_cmap('jet')
     heat_img = cmap(alpha)[:, :, :-1] * 255
 

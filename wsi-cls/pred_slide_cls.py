@@ -99,7 +99,7 @@ def set_args():
     parser.add_argument('--stride_len',    type=int,  default=448)
     parser.add_argument('--patch_len',     type=int,  default=448)
     parser.add_argument('--batch_size',    type=int,  default=128)
-    parser.add_argument('--test_patch_num',type=int,  default=12)
+    parser.add_argument('--test_patch_num',type=int,  default=24)
     parser.add_argument('--save_overlay',  action='store_true', default=True)
     args = parser.parse_args()
     return args

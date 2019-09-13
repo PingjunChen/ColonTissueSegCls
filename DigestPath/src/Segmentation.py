@@ -109,7 +109,7 @@ def seg_slide_img(seg_model, slide_path, args):
 
 
 def extract_model_feas(patch_model, input_tensor, args):
-    if args.model_name == "resnet50":
+    if args.cnn_model == "resnet50":
         x = patch_model.conv1(input_tensor)
         x = patch_model.bn1(x)
         x = patch_model.relu(x)
@@ -124,7 +124,7 @@ def extract_model_feas(patch_model, input_tensor, args):
         feas = torch.flatten(x, 1)
         logits = patch_model.fc(feas)
         probs = F.softmax(logits, dim=1)
-    elif args.model_name == "vgg16bn":
+    elif args.cnn_model == "vgg16bn":
         x = patch_model.features(input_tensor)
         x = patch_model.avgpool(x)
         x = torch.flatten(x, 1)
@@ -132,7 +132,7 @@ def extract_model_feas(patch_model, input_tensor, args):
         logits = patch_model.classifier[4:](feas)
         probs = F.softmax(logits, dim=-1)
     else:
-        raise AssertionError("Unknown model name {}".format(args.model_name))
+        raise AssertionError("Unknown model name {}".format(args.cnn_model))
 
     return feas, probs
 
@@ -199,19 +199,19 @@ def set_args():
     parser.add_argument("--seg_class_num",   type=int,  default=1)
     parser.add_argument('--wsi_class_num',   type=int,  default=2)
     parser.add_argument("--seg_batch_size",  type=int,  default=48)
-    parser.add_argument('--cls_batch_size',  type=int,  default=160)
+    parser.add_argument('--cls_batch_size',  type=int,  default=128)
     parser.add_argument('--stride_len',      type=int,  default=448)
     parser.add_argument('--patch_len',       type=int,  default=448)
 
     parser.add_argument('--input_dir',       type=str,  default="/input")
     parser.add_argument('--output_dir',      type=str,  default="/output")
     parser.add_argument('--model_dir',       type=str,  default="./Models")
-    parser.add_argument("--best_seg_model",  type=str,  default="PSP-050-0.665.pth")
+    parser.add_argument("--best_seg_model",  type=str,  default="PSP-049-0.670.pth")
     parser.add_argument('--cnn_model',       type=str,  default="vgg16bn")
     parser.add_argument('--fea_len',         type=int,  default=4096)
     parser.add_argument('--best_patch_model',type=str,  default="1235-05-0.909.pth")
-    parser.add_argument('--fusion_mode',     type=str,  default="selfatt")
-    parser.add_argument('--wsi_model_name',  type=str,  default="1235-64-0.985.pth")
+    parser.add_argument('--fusion_mode',     type=str,  default="pooling")
+    parser.add_argument('--wsi_model_name',  type=str,  default="1235-80-0.981.pth")
     parser.add_argument('--wsi_patch_num',   type=int,  default=12)
     parser.add_argument('--gt_exist',        action='store_true', default=True)
 
@@ -247,7 +247,6 @@ if __name__ == "__main__":
         seg_slide_img(seg_model, test_slide_path, args)
         pos_prob = cls_slide_img(patch_model, wsi_model, test_slide_path, args)
         score_list.append(pos_prob)
-        # print("Positive probability: {:.3f}".format(pos_prob))
         end_time = timer()
         print("Takes {}".format(pydaily.tic.time_to_str(end_time-start_time, 'sec')))
 

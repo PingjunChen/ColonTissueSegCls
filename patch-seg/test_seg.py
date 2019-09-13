@@ -42,10 +42,14 @@ def set_args():
 
 
 def test_seg_model(args):
-    model = pspnet.PSPNet(n_classes=19, input_size=(448, 448))
-    model.load_pretrained_model(model_path="./segnet/pspnet/pspnet101_cityscapes.caffemodel")
-    model.classification = nn.Conv2d(512, args.class_num, kernel_size=1)
-    model_path = os.path.join(args.model_dir, args.best_model)
+    if args.model_name == "UNet":
+        model = UNet(n_channels=args.in_channels, n_classes=args.class_num)
+    elif args.model_name == "PSP":
+        model = pspnet.PSPNet(n_classes=19, input_size=(448, 448))
+        model.classification = nn.Conv2d(512, args.class_num, kernel_size=1)
+        model_path = os.path.join(args.model_dir, args.best_model)
+    else:
+        raise NotImplemented("Unknown model {}".format(args.model_name))        
     model = nn.DataParallel(model)
     model.load_state_dict(torch.load(model_path))
     model.cuda()
