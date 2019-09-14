@@ -201,7 +201,6 @@ def set_args():
     parser.add_argument('--device_id',       type=str,  default="0",  help='which device')
 
     parser.add_argument("--in_channels",     type=int,  default=3)
-    parser.add_argument("--seg_model_name",  type=str,  default="UNet")
     parser.add_argument("--seg_class_num",   type=int,  default=1)
     parser.add_argument('--wsi_class_num',   type=int,  default=2)
     parser.add_argument("--seg_batch_size",  type=int,  default=48)
@@ -212,7 +211,8 @@ def set_args():
     parser.add_argument('--input_dir',       type=str,  default="/input")
     parser.add_argument('--output_dir',      type=str,  default="/output")
     parser.add_argument('--model_dir',       type=str,  default="./Models")
-    parser.add_argument("--best_seg_model",  type=str,  default="UNet-048-0.623.pth")
+    parser.add_argument("--seg_model_name",  type=str,  default="PSP")
+    parser.add_argument("--best_seg_model",  type=str,  default="PSP-049-0.670.pth")
     parser.add_argument('--cnn_model',       type=str,  default="vgg16bn")
     parser.add_argument('--fea_len',         type=int,  default=4096)
     parser.add_argument('--best_patch_model',type=str,  default="1235-05-0.909.pth")
