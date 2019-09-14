@@ -21,8 +21,8 @@ warnings.simplefilter("ignore", UserWarning)
 import pydaily
 
 
-from segnet import pspnet
-from utils import wsi_stride_splitting,  gen_patch_wmap
+from segnet import pspnet, UNet
+from utils import wsi_stride_splitting
 from patch_loader import PatchDataset
 
 
@@ -30,12 +30,13 @@ def set_args():
     parser = argparse.ArgumentParser(description = 'Colon Tumor Slide Segmentation')
     parser.add_argument("--class_num",       type=int,   default=1)
     parser.add_argument("--in_channels",     type=int,   default=3)
-    parser.add_argument("--batch_size",      type=int,   default=32)
+    parser.add_argument("--batch_size",      type=int,   default=24)
     parser.add_argument("--stride_len",      type=int,   default=448)
     parser.add_argument("--patch_len",       type=int,   default=448)
-    parser.add_argument("--gpu",             type=str,   default="4")
-    parser.add_argument("--best_model",      type=str,   default="PSP-050-0.665.pth")
-    parser.add_argument("--model_dir",       type=str,   default="../data/PatchSeg/BestModels")
+    parser.add_argument("--model_name",      type=str,   default="UNet")
+    parser.add_argument("--gpu",             type=str,   default="1, 2, 3")
+    parser.add_argument("--best_model",      type=str,   default="UNet-048-0.623.pth")
+    parser.add_argument("--model_dir",       type=str,   default="../data/PatchSeg/Model1235")
     parser.add_argument("--slides_dir",      type=str,   default="../data/SlideSeg/TestPosSlides")
     parser.add_argument("--result_dir",      type=str,   default="../data/SlideSeg/TestPosResultsPred")
     parser.add_argument("--seed",            type=int,   default=1234)
@@ -45,9 +46,13 @@ def set_args():
 
 
 def test_slide_seg(args):
-    model = pspnet.PSPNet(n_classes=19, input_size=(args.patch_len, args.patch_len))
-    # model.load_pretrained_model(model_path="./segnet/pspnet/pspnet101_cityscapes.caffemodel")
-    model.classification = nn.Conv2d(512, args.class_num, kernel_size=1)
+    if args.model_name == "UNet":
+        model = UNet(n_channels=args.in_channels, n_classes=args.class_num)
+    elif args.model_name == "PSP":
+        model = pspnet.PSPNet(n_classes=19, input_size=(args.patch_len, args.patch_len))
+        model.classification = nn.Conv2d(512, args.class_num, kernel_size=1)
+    else:
+        raise NotImplemented("Unknown model {}".format(args.model_name))
 
     model_path = os.path.join(args.model_dir, args.best_model)
     model = nn.DataParallel(model)
