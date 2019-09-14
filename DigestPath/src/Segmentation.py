@@ -21,15 +21,20 @@ warnings.simplefilter("ignore", UserWarning)
 import pydaily
 from pyslide import patch
 
-from segnet import pspnet
+from segnet import pspnet, UNet
 from utils import wsi_stride_splitting
 from patch_loader import SegPatchDataset, ClsPatchDataset
 from wsinet import WsiNet
 
 
 def load_seg_model(args):
-    seg_model = pspnet.PSPNet(n_classes=19, input_size=(args.patch_len, args.patch_len))
-    seg_model.classification = nn.Conv2d(512, args.seg_class_num, kernel_size=1)
+    if args.model_name == "UNet":
+        seg_model = UNet(n_channels=args.in_channels, n_classes=args.seg_class_num)
+    elif args.model_name == "PSP":
+        seg_model = pspnet.PSPNet(n_classes=19, input_size=(args.patch_len, args.patch_len))
+        seg_model.classification = nn.Conv2d(512, args.seg_class_num, kernel_size=1)
+    else:
+        raise NotImplemented("Unknown model {}".format(args.model_name))
 
     seg_model_path = os.path.join(args.model_dir, "SegBestModel", args.best_seg_model)
     seg_model = nn.DataParallel(seg_model)
@@ -196,6 +201,7 @@ def set_args():
     parser.add_argument('--device_id',       type=str,  default="0",  help='which device')
 
     parser.add_argument("--in_channels",     type=int,  default=3)
+    parser.add_argument("--seg_model_name",  type=str,  default="UNet")
     parser.add_argument("--seg_class_num",   type=int,  default=1)
     parser.add_argument('--wsi_class_num',   type=int,  default=2)
     parser.add_argument("--seg_batch_size",  type=int,  default=48)
@@ -206,7 +212,7 @@ def set_args():
     parser.add_argument('--input_dir',       type=str,  default="/input")
     parser.add_argument('--output_dir',      type=str,  default="/output")
     parser.add_argument('--model_dir',       type=str,  default="./Models")
-    parser.add_argument("--best_seg_model",  type=str,  default="PSP-049-0.670.pth")
+    parser.add_argument("--best_seg_model",  type=str,  default="UNet-048-0.623.pth")
     parser.add_argument('--cnn_model',       type=str,  default="vgg16bn")
     parser.add_argument('--fea_len',         type=int,  default=4096)
     parser.add_argument('--best_patch_model',type=str,  default="1235-05-0.909.pth")
