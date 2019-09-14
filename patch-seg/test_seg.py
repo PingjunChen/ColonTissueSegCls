@@ -29,12 +29,12 @@ def set_args():
 
     parser.add_argument("--class_num",       type=int,   default=1)
     parser.add_argument("--in_channels",     type=int,   default=3)
-    parser.add_argument("--batch_size",      type=int,   default=8)
-    parser.add_argument("--gpu",             type=str,   default="0")
-    parser.add_argument("--model_name",      type=str,   default="PSP")
-    parser.add_argument("--best_model",      type=str,   default="PSP-023-0.667.pth")
-    parser.add_argument("--model_dir",       type=str,   default="../data/PatchSeg/BestModels")
-    parser.add_argument("--data_dir",        type=str,   default="../data/PatchSeg/SegPatches")
+    parser.add_argument("--batch_size",      type=int,   default=24)
+    parser.add_argument("--gpu",             type=str,   default="1, 2, 3")
+    parser.add_argument("--model_name",      type=str,   default="UNet")
+    parser.add_argument("--best_model",      type=str,   default="UNet-048-0.623.pth")
+    parser.add_argument("--model_dir",       type=str,   default="../data/PatchSeg/Model1235")
+    parser.add_argument("--data_dir",        type=str,   default="../data/PatchSeg/SegPatches1235")
     parser.add_argument("--seed",            type=int,   default=1234)
 
     args = parser.parse_args()
@@ -47,9 +47,9 @@ def test_seg_model(args):
     elif args.model_name == "PSP":
         model = pspnet.PSPNet(n_classes=19, input_size=(448, 448))
         model.classification = nn.Conv2d(512, args.class_num, kernel_size=1)
-        model_path = os.path.join(args.model_dir, args.best_model)
     else:
-        raise NotImplemented("Unknown model {}".format(args.model_name))        
+        raise NotImplemented("Unknown model {}".format(args.model_name))
+    model_path = os.path.join(args.model_dir, args.best_model)
     model = nn.DataParallel(model)
     model.load_state_dict(torch.load(model_path))
     model.cuda()
