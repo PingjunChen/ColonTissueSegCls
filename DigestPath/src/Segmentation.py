@@ -198,7 +198,7 @@ def cls_slide_img(patch_model, wsi_model, slide_path, args):
 def set_args():
     parser = argparse.ArgumentParser(description = 'Colon Tumor Slide Segmentation')
     parser.add_argument("--seed",            type=int,  default=1234)
-    parser.add_argument('--device_id',       type=str,  default="0",  help='which device')
+    parser.add_argument('--device_id',       type=str,  default="4",  help='which device')
 
     parser.add_argument("--in_channels",     type=int,  default=3)
     parser.add_argument("--seg_class_num",   type=int,  default=1)
