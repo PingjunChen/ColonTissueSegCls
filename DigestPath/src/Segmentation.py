@@ -28,13 +28,13 @@ from wsinet import WsiNet
 
 
 def load_seg_model(args):
-    if args.model_name == "UNet":
+    if args.seg_model_name == "UNet":
         seg_model = UNet(n_channels=args.in_channels, n_classes=args.seg_class_num)
-    elif args.model_name == "PSP":
+    elif args.seg_model_name == "PSP":
         seg_model = pspnet.PSPNet(n_classes=19, input_size=(args.patch_len, args.patch_len))
         seg_model.classification = nn.Conv2d(512, args.seg_class_num, kernel_size=1)
     else:
-        raise NotImplemented("Unknown model {}".format(args.model_name))
+        raise NotImplemented("Unknown model {}".format(args.seg_model_name))
 
     seg_model_path = os.path.join(args.model_dir, "SegBestModel", args.best_seg_model)
     seg_model = nn.DataParallel(seg_model)
@@ -212,12 +212,12 @@ def set_args():
     parser.add_argument('--output_dir',      type=str,  default="/output")
     parser.add_argument('--model_dir',       type=str,  default="./Models")
     parser.add_argument("--seg_model_name",  type=str,  default="PSP")
-    parser.add_argument("--best_seg_model",  type=str,  default="PSP-050-0.665.pth")
-    parser.add_argument('--cnn_model',       type=str,  default="resnet50")
-    parser.add_argument('--fea_len',         type=int,  default=2048)
-    parser.add_argument('--best_patch_model',type=str,  default="1235-04-0.897.pth")
+    parser.add_argument("--best_seg_model",  type=str,  default="PSP-049-0.670.pth")
+    parser.add_argument('--cnn_model',       type=str,  default="vgg16bn")
+    parser.add_argument('--fea_len',         type=int,  default=4096)
+    parser.add_argument('--best_patch_model',type=str,  default="1235-05-0.909.pth")
     parser.add_argument('--fusion_mode',     type=str,  default="selfatt")
-    parser.add_argument('--wsi_model_name',  type=str,  default="1235-28-0.979.pth")
+    parser.add_argument('--wsi_model_name',  type=str,  default="1235-64-0.981.pth")
     parser.add_argument('--wsi_patch_num',   type=int,  default=12)
     parser.add_argument('--gt_exist',        action='store_true', default=True)
 
