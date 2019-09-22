@@ -82,7 +82,7 @@ def seg_slide_img(seg_model, slide_path, args):
         if len(patch_list) == args.seg_batch_size or ic+1 == len(coors_arr):
             patch_arr = np.asarray(patch_list).astype(np.float32)
             patch_dset = SegPatchDataset(patch_arr)
-            patch_loader = DataLoader(patch_dset, batch_size=args.seg_batch_size, shuffle=False, num_workers=4, drop_last=False)
+            patch_loader = DataLoader(patch_dset, batch_size=args.seg_batch_size, shuffle=False, num_workers=0, drop_last=False)
             with torch.no_grad():
                 pred_list = []
                 for patches in patch_loader:
@@ -162,7 +162,7 @@ def gen_wsi_feas(patch_model, img_path, args):
         if len(patch_list) == args.cls_batch_size or ind+1 == len(coors_arr):
             patch_arr = np.asarray(patch_list)
             patch_dset = ClsPatchDataset(patch_arr)
-            patch_loader = DataLoader(patch_dset, batch_size=args.cls_batch_size, shuffle=False, num_workers=4, drop_last=False)
+            patch_loader = DataLoader(patch_dset, batch_size=args.cls_batch_size, shuffle=False, num_workers=0, drop_last=False)
             with torch.no_grad():
                 for inputs in patch_loader:
                     batch_tensor = Variable(inputs.cuda())
@@ -203,8 +203,8 @@ def set_args():
     parser.add_argument("--in_channels",     type=int,  default=3)
     parser.add_argument("--seg_class_num",   type=int,  default=1)
     parser.add_argument('--wsi_class_num',   type=int,  default=2)
-    parser.add_argument("--seg_batch_size",  type=int,  default=48)
-    parser.add_argument('--cls_batch_size',  type=int,  default=128)
+    parser.add_argument("--seg_batch_size",  type=int,  default=16)
+    parser.add_argument('--cls_batch_size',  type=int,  default=96)
     parser.add_argument('--stride_len',      type=int,  default=448)
     parser.add_argument('--patch_len',       type=int,  default=448)
 
@@ -227,7 +227,6 @@ def set_args():
 
 if __name__ == "__main__":
     print("Start testing...")
-
     args = set_args()
     os.environ["CUDA_VISIBLE_DEVICES"] = str(args.device_id)
 
