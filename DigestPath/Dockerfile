@@ -4,6 +4,6 @@ FROM wsi/cuda90:latest
 USER root
 
 # Create a working directory
-RUN mkdir /digestpath 
+RUN mkdir /digestpath
 COPY src /digestpath/
 WORKDIR /digestpath
