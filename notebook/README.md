@@ -22,7 +22,7 @@ $ docker images
 ## Start container
 ```
 $ docker run -it --name chenpingjun --restart always -v ~/CPath/colon-tissue-seg:/App digestpath:chenpingjun
-$ docker run -dit --runtime nvidia  --restart always --shm-size 60G --name chenpingjun -v /home/pingjun/CPath/colon-tissue-seg/DigestPath/data/input:/input:ro -v /output -e NVIDIA_VISIBLE_DEVICES=5 digestpath:chenpingjun_task2
+$ docker run -dit --runtime nvidia  --restart always --shm-size 16G --name chenpingjun -v /home/pingjun/CPath/colon-tissue-seg/DigestPath/data/input:/input:ro -v /output -e NVIDIA_VISIBLE_DEVICES=5 digestpath:chenpingjun_task2
 $ docker exec -u 0 -it chenpingjun /bin/bash
 $ docker exec -it chenpingjun python /digestpath/Segmentation.py
 $ docker exec -it chenpingjun /bin/bash
@@ -31,6 +31,11 @@ $ docker exec -it chenpingjun /bin/bash
 ## Show running containers
 ```
 $ docker ps
+```
+
+## Copy files
+```
+$ docker cp chenpingjun:/output .
 ```
 
 ## Stop container
