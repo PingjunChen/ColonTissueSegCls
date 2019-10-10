@@ -13,7 +13,7 @@ import pydaily
 from pyslide import patch
 
 
-def gen_patches(img_dir, patch_dir, patch_size=512):
+def gen_patches(img_dir, patch_dir, patch_size=448):
     img_list = pydaily.filesystem.find_ext_files(img_dir, "jpg")
     img_list = [os.path.basename(ele) for ele in img_list]
     pos_patch_dir = os.path.join(patch_dir, "1Pos")
@@ -57,10 +57,10 @@ def gen_patches(img_dir, patch_dir, patch_size=512):
 
 
 if __name__ == "__main__":
-    # img_dir = "../data/tissue-train-pos"
-    img_dir = "../data/tissue-train-neg"
+    img_dir = "../data/tissue-train-pos"
+    # img_dir = "../data/tissue-train-neg"
     patch_dir = "../data/ClsPatches"
-    # mode = "val"
-    mode = "train"
+    mode = "val"
+    # mode = "train"
 
     gen_patches(os.path.join(img_dir, mode), os.path.join(patch_dir, mode), patch_size=448)
