@@ -14,15 +14,15 @@ from wsi_train_engine import train_cls
 def set_args():
     # Arguments setting
     parser = argparse.ArgumentParser(description="Colon image classification")
-    parser.add_argument('--data_dir',        type=str,          default="../data/SlideCLS/Split1234")
-    parser.add_argument('--patch_model',     type=str,          default="vgg16bn")
-    parser.add_argument('--fea_len',         type=int,          default=4096)
+    parser.add_argument('--data_dir',        type=str,          default="../data/SlideCLS/Split1238")
+    parser.add_argument('--patch_model',     type=str,          default="resnet50")
+    parser.add_argument('--fea_len',         type=int,          default=2048)
     parser.add_argument('--batch_size',      type=int,          default=32,      help='batch size.')
-    parser.add_argument('--device_id',       type=str,          default="7",     help='which device')
+    parser.add_argument('--device_id',       type=str,          default="2",     help='which device')
     parser.add_argument('--pre_load',        type=bool,         default=True,    help='load setting')
     parser.add_argument('--lr',              type=float,        default=1.0e-3,  help='learning rate (default: 0.01)')
     parser.add_argument('--maxepoch',        type=int,          default=100,     help='number of epochs to train (default: 10)')
-    parser.add_argument('--fusion_mode',     type=str,          default="pooling")
+    parser.add_argument('--fusion_mode',     type=str,          default="selfatt")
 
     args = parser.parse_args()
     return args

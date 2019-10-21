@@ -13,14 +13,14 @@ from wsi_test_engine import load_wsinet, test_cls
 def set_args():
     # Arguments setting
     parser = argparse.ArgumentParser(description="TCT slides classification")
-    parser.add_argument('--feas_dir',        type=str,          default="../data/SlideCLS/Split1235/SlideFeas")
-    parser.add_argument('--model_dir',       type=str,          default="../data/SlideCLS/Split1235/WsiModels")
+    parser.add_argument('--feas_dir',        type=str,          default="../data/SlideCLS/Split1238/SlideFeas")
+    parser.add_argument('--model_dir',       type=str,          default="../data/SlideCLS/Split1238/WsiModels")
     parser.add_argument('--batch_size',      type=int,          default=16,         help='batch size.')
-    parser.add_argument('--device_id',       type=str,          default="7",        help='which device')
-    parser.add_argument('--cnn_model',       type=str,          default="resnet50",  help='cnn model')
-    parser.add_argument('--fea_len',         type=int,          default=2048)
+    parser.add_argument('--device_id',       type=str,          default="2",        help='which device')
+    parser.add_argument('--cnn_model',       type=str,          default="vgg16bn",  help='cnn model')
+    parser.add_argument('--fea_len',         type=int,          default=4096)
     parser.add_argument('--fusion_mode',     type=str,          default="selfatt")
-    parser.add_argument('--wsi_cls_name',    type=str,          default="1235-28-0.979.pth")
+    parser.add_argument('--wsi_cls_name',    type=str,          default="epoch_099_acc_0.977_tn_080_fp_002_fn_001_tp_049.pth")
 
     args = parser.parse_args()
     return args
@@ -35,7 +35,7 @@ if  __name__ == '__main__':
     # prepare model
     wsinet = load_wsinet(args)
     # prepare dataset
-    test_data_dir = os.path.join(args.feas_dir, args.cnn_model, "train")
+    test_data_dir = os.path.join(args.feas_dir, args.cnn_model, "val")
     test_dataset = wsiDataSet(test_data_dir, pre_load=True, testing=True)
     test_dataloader = DataLoader(dataset=test_dataset, batch_size=args.batch_size, shuffle=False, num_workers=4, pin_memory=True)
     # start testing

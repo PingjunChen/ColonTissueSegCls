@@ -33,7 +33,6 @@ def train_cls(net, train_dataloader, test_dataloader, model_root, args):
         for batch_idx, (batch_feas, gt_classes, true_num) in enumerate(train_dataloader):
             im_data = Variable(batch_feas.cuda())
             im_label = Variable(gt_classes.cuda())
-            # num_data = Variable(true_num.cuda())
             im_label = im_label.view(-1, 1)
             out, assignments = net(im_data, im_label, true_num=true_num)
             loss = net.loss
