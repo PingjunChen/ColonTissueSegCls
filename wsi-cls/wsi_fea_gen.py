@@ -102,12 +102,12 @@ def gen_wsi_feas(patch_model, img_dir, fea_dir, args):
 
 def set_args():
     parser = argparse.ArgumentParser(description="WSI patch-based feature extraction")
-    parser.add_argument('--img_dir',       type=str,  default="../data/SlideCLS/Split1237/SlideImgs/Pos/train")
-    parser.add_argument('--fea_dir',       type=str,  default="../data/SlideCLS/Split1237/SlideFeas/resnet50/train/1Pos")
-    parser.add_argument('--model_dir',     type=str,  default="../data/PatchCLS/Split1237/Models")
-    parser.add_argument('--model_name',    type=str,  default="resnet50")
-    parser.add_argument('--patch_cls_name',type=str,  default="07-0.930.pth")
-    parser.add_argument('--device_id',     type=str,  default="7",  help='which device')
+    parser.add_argument('--img_dir',       type=str,  default="../data/SlideCLS/Split1238/SlideImgs/Pos/train")
+    parser.add_argument('--fea_dir',       type=str,  default="../data/SlideCLS/Split1238/SlideFeas/vgg16bn/train/1Pos")
+    parser.add_argument('--model_dir',     type=str,  default="../data/PatchCLS/Split1238/Models")
+    parser.add_argument('--model_name',    type=str,  default="vgg16bn")
+    parser.add_argument('--patch_cls_name',type=str,  default="07-0.873.pth")
+    parser.add_argument('--device_id',     type=str,  default="2",  help='which device')
     parser.add_argument('--class_num',     type=int,  default=2)
     parser.add_argument('--patch_len',     type=int,  default=448)
     parser.add_argument('--stride_len',    type=int,  default=256)
