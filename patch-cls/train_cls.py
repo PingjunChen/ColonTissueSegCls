@@ -19,11 +19,11 @@ def set_args():
     parser.add_argument('--seed',            type=int,   default=1234)
     parser.add_argument('--log_interval',    type=int,   default=100)
     # model directory and name
-    parser.add_argument('--model_dir',       type=str,   default="../data/PatchCLS/Split1238/Models")
+    parser.add_argument('--model_dir',       type=str,   default="../data/PatchCLS/Split1239/Models")
     parser.add_argument('--class_num',       type=int,   default=2)
-    parser.add_argument('--model_name',      type=str,   default="resnet50")
+    parser.add_argument('--model_name',      type=str,   default="vgg16bn")
     parser.add_argument('--session',         type=str,   default="01")
-    parser.add_argument("--gpu",             type=str,   default="5",     help="training gpu")
+    parser.add_argument("--gpu",             type=str,   default="2",     help="training gpu")
 
     args = parser.parse_args()
     return args
