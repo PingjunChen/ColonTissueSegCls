@@ -31,7 +31,7 @@ def split_train_val(img_dir, ratio):
 
 
 if __name__ == "__main__":
-    np.random.seed(1238)
+    np.random.seed(1239)
     # split pos to train/val, remove *mask.jpg first
     img_dir = "../data/tissue-train-pos"
     split_train_val(img_dir, ratio=0.2)
