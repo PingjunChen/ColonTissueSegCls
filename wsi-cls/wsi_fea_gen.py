@@ -131,5 +131,4 @@ if __name__ == "__main__":
     patch_model.cuda()
     patch_model.eval()
     print('Load patch classification model from {}'.format(args.patch_cls_name))
-
     gen_wsi_feas(patch_model, args.img_dir, args.fea_dir, args)
