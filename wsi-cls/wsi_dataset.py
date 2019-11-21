@@ -37,11 +37,13 @@ class wsiDataSet(Dataset):
         self.img_num = len(self.file_list)
         self.indices = list(range(self.img_num))
 
-        self.testing_num = 12
+
         self.fixed_num = 8
-        self.additoinal_num = 2
+        self.additoinal_num = 4
         self.cell_low_num = 10
         self.cell_high_num = 18
+        # self.testing_num = 12
+        self.testing_num = self.cell_low_num
 
         self.chosen_num_list = list(range(self.cell_low_num, self.cell_high_num))
         self.max_num = self.cell_high_num if not self.testing else self.testing_num

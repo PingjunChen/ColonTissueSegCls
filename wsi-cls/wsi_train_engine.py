@@ -22,7 +22,7 @@ class LambdaLR():
 
 
 def train_cls(net, train_dataloader, test_dataloader, model_root, args):
-    optimizer = torch.optim.SGD(net.parameters(), lr=args.lr, momentum=0.9, weight_decay=1.0e-5, nesterov=True)
+    optimizer = torch.optim.SGD(net.parameters(), lr=args.lr, momentum=0.9, weight_decay=5.0e-40, nesterov=True)
     lr_scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=LambdaLR(args.maxepoch, 0, 0).step)
 
     best_eval_acc = 0.90
