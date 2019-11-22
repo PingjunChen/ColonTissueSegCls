@@ -5,6 +5,7 @@ data
 *.png
 *.jpg
 *.tif
+*.pdf
 
 # Folders
 data/
