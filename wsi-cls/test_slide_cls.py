@@ -13,14 +13,14 @@ from wsi_test_engine import load_wsinet, test_cls
 def set_args():
     # Arguments setting
     parser = argparse.ArgumentParser(description="TCT slides classification")
-    parser.add_argument('--feas_dir',        type=str,          default="../data/SlideCLS/Split1236/SlideFeas")
-    parser.add_argument('--model_dir',       type=str,          default="../data/SlideCLS/Split1236/WsiModels")
+    parser.add_argument('--feas_dir',        type=str,          default="../data/SlideCLS/Split1238/SlideFeas")
+    parser.add_argument('--model_dir',       type=str,          default="../data/SlideCLS/Split1238/WsiModels")
     parser.add_argument('--batch_size',      type=int,          default=16,         help='batch size.')
     parser.add_argument('--device_id',       type=str,          default="2",        help='which device')
     parser.add_argument('--cnn_model',       type=str,          default="vgg16bn",  help='cnn model')
     parser.add_argument('--fea_len',         type=int,          default=4096)
-    parser.add_argument('--fusion_mode',     type=str,          default="selfatt")
-    parser.add_argument('--wsi_cls_name',    type=str,          default="model-985.pth")
+    parser.add_argument('--fusion_mode',     type=str,          default="pooling")
+    parser.add_argument('--wsi_cls_name',    type=str,          default="model-977.pth")
 
     args = parser.parse_args()
     return args
