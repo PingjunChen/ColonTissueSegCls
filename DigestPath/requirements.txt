@@ -3,7 +3,7 @@ Pillow==6.2.0
 openslide-python==1.1.1
 scikit-image==0.14.2
 scikit-learn==0.21.3
-opencv-python==3.4.4.19
+opencv-python==4.2.0.32
 shapely==1.6.4
 pydaily==0.4.0
 pycontour==1.4.0
